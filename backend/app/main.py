@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-from db import engine
+from db import engine, Base
 
 app = FastAPI(
     title="Geo Quiz API",

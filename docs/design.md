@@ -622,24 +622,24 @@ GET /api/leaderboard?limit=10&mode=capitals
 
 ### Поля
 
-|Поле|Тип|Описание|
-|---|---|---|
-|`id`|number|Уникальный идентификатор вопроса|
-|`text`|string|Текст вопроса|
-|`mode`|string|Режим игры (`capitals`, `countries`, `landmarks`)|
-|`targetName`|string|Название объекта|
-|`targetType`|string|Тип объекта (`city`, `country`, `landmark`)|
-|`correctLat`|number|Правильная широта|
-|`correctLng`|number|Правильная долгота|
-|`difficulty`|string|Уровень сложности|
-|`isActive`|boolean|Признак доступности вопроса|
+| Поле           | Тип     | Описание                                          |
+| -------------- | ------- | ------------------------------------------------- |
+| `id`           | number  | Уникальный идентификатор вопроса                  |
+| `questionText` | string  | Текст вопроса                                     |
+| `mode`         | string  | Режим игры (`capitals`, `countries`, `landmarks`) |
+| `targetName`   | string  | Название объекта                                  |
+| `targetType`   | string  | Тип объекта (`city`, `country`, `landmark`)       |
+| `correctLat`   | float   | Правильная широта                                 |
+| `correctLng`   | float   | Правильная долгота                                |
+| `difficulty`   | string  | Уровень сложности (easy,, medium, hard)           |
+| `isActive`     | boolean | Признак доступности вопроса                       |
 
 ### Пример
 
 ```json
 {
   "id": 1,
-  "text": "Отметьте на карте столицу Франции",
+  "questionText": "Отметьте на карте столицу Франции",
   "mode": "capitals",
   "targetName": "Paris",
   "targetType": "city",
@@ -656,17 +656,18 @@ GET /api/leaderboard?limit=10&mode=capitals
 
 ### Поля
 
-|Поле|Тип|Описание|
-|---|---|---|
-|`id`|number|Уникальный идентификатор сессии|
-|`mode`|string|Выбранный режим игры|
-|`difficulty`|string|Уровень сложности|
-|`totalQuestions`|number|Общее количество вопросов|
-|`currentQuestionIndex`|number|Индекс текущего вопроса|
-|`score`|number|Текущий суммарный счёт|
-|`status`|string|Статус сессии (`active`, `finished`)|
-|`startedAt`|datetime|Время начала игры|
-|`finishedAt`|datetime / null|Время завершения игры|
+| Поле                   | Тип             | Описание                             |
+| ---------------------- | --------------- | ------------------------------------ |
+| `id`                   | number          | Уникальный идентификатор сессии      |
+| `mode`                 | string          | Выбранный режим игры                 |
+| `difficulty`           | string          | Уровень сложности                    |
+| `totalQuestions`       | number          | Общее количество вопросов            |
+| `currentQuestionIndex` | number          | Индекс текущего вопроса              |
+| `score`                | number          | Текущий суммарный счёт               |
+| `status`               | string          | Статус сессии (`active`, `finished`) |
+| `startedAt`            | datetime        | Время начала игры                    |
+| `finishedAt`           | datetime / null | Время завершения игры                |
+| playerName             | string          | Имя игрока                           |
 
 ### Пример
 
@@ -680,7 +681,8 @@ GET /api/leaderboard?limit=10&mode=capitals
   "score": 3150,
   "status": "active",
   "startedAt": "2026-04-05T13:40:00Z",
-  "finishedAt": null
+  "finishedAt": null,
+  "playerName": "Mika"
 }
 ```
 
@@ -744,7 +746,31 @@ GET /api/leaderboard?limit=10&mode=capitals
 }
 ```
 
-## 1.4.5. Связи между сущностями
+## 1.4.8. Сущность AdminUser
+
+**Назначение:** хранит данные администратора, который может добавлять/редактировать/удалять вопросы.
+
+### Поля
+
+| Поле       | Тип     | Описание                       |
+| ---------- | ------- | ------------------------------ |
+| `id`       | number  | Уникальный идентификатор       |
+| `username` | string  | Логин администратора           |
+| `password` | string  | Хэш пароля                     |
+| `email`    | string  | Контактный email (опционально) |
+| `isActive` | boolean | Аккаунт активен или нет        |
+### Пример
+
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "password": "$2b$12$...",
+  "email": "admin@example.com",
+  "isActive": true
+}
+```
+## Связи между сущностями
 
 Между сущностями предполагаются следующие связи:
 - **GameSession → Answer** — связь **один ко многим**  
@@ -753,17 +779,19 @@ GET /api/leaderboard?limit=10&mode=capitals
     Один и тот же вопрос может использоваться в разных игровых сессиях.
 - **GameSession → LeaderboardEntry** — связь **один к нулю или одному**  
     Одна игровая сессия может быть сохранена в рейтинге один раз либо не быть сохранена вовсе.
+- **AdminUser → Question** — связь **один ко многим**  
+    Админ может создавать или редактировать множество вопросов, каждый вопрос связан с администратором, который его добавил.
 
-## 1.4.6. Логическая структура базы данных
+## Логическая структура базы данных
 
 Для хранения данных предполагается использование следующих таблиц:
-- `questions`
-- `game_sessions`
-- `answers`
-- `leaderboard`
+- `questions` — вопросы викторины
+- `game_sessions` — сессии игроков
+- `answers` — ответы пользователей
+- `leaderboard` — итоговые результаты
+- `admin_users` — данные администраторов
 
-
-## 1.4.7. Ограничения данных
+## Ограничения данных
 
 Для обеспечения корректности данных рекомендуется ввести следующие ограничения:
 - `playerName` не должен быть пустым;
@@ -774,6 +802,11 @@ GET /api/leaderboard?limit=10&mode=capitals
 - `correctLng` должен находиться в диапазоне **[-180; 180]**;
 - результат может быть сохранён в рейтинг **только после завершения игровой сессии**;
 - в рамках одной игровой сессии один и тот же вопрос не должен быть отвечен более одного раза.
+- Для админки:
+	- - `username` уникален
+	- `email` уникален (если указан)
+	- Пароль хранится только в виде хэша
+	- `isActive = false` блокирует доступ к админке
 ---
 # 1.5. Ключевые технические решения
 
