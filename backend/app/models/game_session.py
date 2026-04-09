@@ -21,3 +21,4 @@ class GameSession(Base):
 
     answers = relationship("Answer", back_populates="session")
     leaderboard_entry = relationship("LeaderboardEntry", back_populates="session", uselist=False)
+    session_questions = relationship("SessionQuestion", back_populates="session")

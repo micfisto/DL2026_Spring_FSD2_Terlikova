@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-from db import engine, Base
+from backend.app.db import engine, Base
+
+from fastapi.middleware.cors import CORSMiddleware
+from backend.app.models import *
+from backend.app.routes import game_router
 
 app = FastAPI(
     title="Geo Quiz API",
@@ -8,6 +12,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
+Base.metadata.create_all(engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+app.include_router(game_router)
 
 @app.get("/")
 def root():

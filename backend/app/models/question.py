@@ -16,3 +16,4 @@ class Question(Base):
     is_active = Column(Boolean, default=True)
 
     answers = relationship("Answer", back_populates="question")
+    session_questions = relationship("SessionQuestion", back_populates="question")
