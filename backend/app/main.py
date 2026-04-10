@@ -5,6 +5,7 @@ from backend.app.db import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.models import *
 from backend.app.routes import game_router
+from backend.app.routes.leaderboard import router as leaderboard_router
 
 app = FastAPI(
     title="Geo Quiz API",
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(game_router)
+app.include_router(leaderboard_router)
 
 @app.get("/")
 def root():
