@@ -153,3 +153,19 @@
     - создать базовую структуру страниц
 
 ---
+[12.04.2026]
+
+**Сделано:**
+
+- Выполнена оценка текущего состояния проекта: backend полностью структурирован с моделями (admin_user, question, game_session и др.), роутами (game, leaderboard, admin), сервисами (auth, admin, game) и утилитами (security с JWT). Frontend пересобран с новой структурой (pages, components, store, api).
+- Реализована JWT-аутентификация администратора: в backend/app/services/admin_service.py реализован admin_login с генерацией токена, в backend/app/utils/security.py - функции generate_token, verify_token. В backend/app/routes/admin.py - защита роутов с get_current_admin.
+- Защита admin-роутов добавлена: Depends(get_current_admin) в защищённых эндпоинтах.
+- Роутинг фронтенда настроен: в frontend/src/routes/AppRouter.jsx определены роуты для Home, Game, Results, NotFound.
+- Базовая структура страниц фронтенда создана: Home.jsx (с выбором режима игры), Game.jsx (игровая страница), Results.jsx, NotFound.jsx. Реализован gameStore.js для управления состоянием игры.
+
+**План на завтра:**
+
+1. Провести базовое тестирование backend API (Postman / Swagger)
+2. Начать интеграцию фронтенда с backend: подключить API-клиенты к реальным эндпоинтам, обработка ошибок и загрузки
+3. Разработать UI-компоненты: заполнить пустые компоненты (Button, Card, Input и др.)
+4. Реализовать функционал игры: интеграция карты (MapView.jsx), таймер, вопросы
