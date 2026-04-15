@@ -208,4 +208,26 @@
 4. Исправить seed-скрипты:
    - Добавить проверку существования записей перед созданием
    - Реализовать логику обновления вместо перезаписи
-5. Подключить хуки `useTimer` и `useQuestions` к игровой логике в `Game.jsx`
+1. Подключить хуки `useTimer` и `useQuestions` к игровой логике в `Game.jsx`
+
+---
+[15.04.2026]
+
+**Сделано:**
+
+- Реализована полноценная админ-панель:
+  - [AdminLogin.jsx](frontend/src/pages/AdminLogin.jsx) - страница входа администратора с формой авторизации
+  - [AdminLogin.css](frontend/src/pages/AdminLogin.css) - стили для страницы входа
+  - [AdminDashboard.jsx](frontend/src/pages/AdminDashboard.jsx) - панель управления вопросами с функционалом CRUD
+  - [AdminDashboard.css](frontend/src/pages/AdminDashboard.css) - стили для админ-панели
+  - [authStore.js](frontend/src/store/authStore.js) - управление состоянием аутентификации через Zustand с persists
+  - [admin.api.js](frontend/src/api/admin.api.js) - API-клиент для всех админ-операций
+- Настроены роуты в [AppRouter.jsx](frontend/src/routes/AppRouter.jsx):
+  - `/admin/login` - страница входа
+  - `/admin` - главная страница админ-панели
+
+**План на завтра:**
+
+1. Исправить ошибку 404 на странице рейтинга
+2. Завершить интеграцию игрового процесса (вопросы, ответы, переход между вопросами)
+3. Протестировать полный игровой цикл от старта до завершения
