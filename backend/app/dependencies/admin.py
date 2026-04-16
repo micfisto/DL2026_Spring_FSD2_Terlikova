@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..utils.security.jwt import verify_token
+from ..utils.security.token import verify_token
 from ..models.admin_user import AdminUser
 
 

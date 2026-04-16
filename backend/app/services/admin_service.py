@@ -11,7 +11,7 @@ from ..schemas.admin import (
 )
 
 from ..utils.security.password import verify_password, hash_password
-from ..utils.security.jwt import generate_token
+from ..utils.security.token import generate_token
 
 
 # ---------------- AUTH ----------------
