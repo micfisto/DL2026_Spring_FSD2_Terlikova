@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from backend.app.db import Base
+from ..db import Base
 
 class AdminUser(Base):
     __tablename__ = 'admin_users'
@@ -8,4 +8,5 @@ class AdminUser(Base):
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
+    token = Column(String, unique=True, nullable=True)
     is_active = Column(Boolean, default=True)

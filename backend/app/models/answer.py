@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, DateTime, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import UniqueConstraint
 
-from backend.app.db import Base
+from ..db import Base
 
 
 class Answer(Base):

@@ -5,7 +5,6 @@ from backend.app.models.session_question import SessionQuestion
 from backend.app.models.answer import Answer
 
 
-# Проверяет, что вопрос принадлежит указанной игровой сессии.
 def validate_question_belongs_to_session(
         db: Session,
         session_id: int,
@@ -25,7 +24,6 @@ def validate_question_belongs_to_session(
     return session_question
 
 
-# Проверяет, был ли уже дан ответ на вопрос в сессии.
 def check_answer_already_exists(
         db: Session,
         session_id: int,

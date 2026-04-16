@@ -1,19 +1,16 @@
 from fastapi import FastAPI
 from sqlalchemy import text
-from backend.app.db import engine, Base
+from .db import engine, Base
 
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.models import *
-from backend.app.routes import game_router
-from backend.app.routes.leaderboard import router as leaderboard_router
+from .routes import game_router
+from .routes.leaderboard import router as leaderboard_router
+from .routes.admin import router as admin_router
 
 app = FastAPI(
-    title="Geo Quiz API",
+    title="GeoQuiz API",
     description="Backend для географической викторины",
-    version="1.0.0"
 )
-
-Base.metadata.create_all(engine)
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,25 +22,9 @@ app.add_middleware(
 
 app.include_router(game_router)
 app.include_router(leaderboard_router)
+app.include_router(admin_router)
+
 
 @app.get("/")
 def root():
     return {"message": "Geo Quiz API is running"}
-
-
-@app.get("/db-test")
-def test_db():
-    try:
-        with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            value = result.scalar()
-
-            return {
-                "message": "Подключение к базе успешно",
-                "result": value
-            }
-    except Exception as e:
-        return {
-            "message": "Ошибка подключения к бд",
-            "error": str(e)
-        }

@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from backend.app.db import Base
+from ..db import Base
 
 
 class GameSession(Base):
@@ -12,7 +12,6 @@ class GameSession(Base):
     mode = Column(String, nullable=False)
     difficulty = Column(String, nullable=False)
     total_questions = Column(Integer, nullable=False)
-    current_question_index = Column(Integer, nullable=False, default=0)
     score = Column(Integer, nullable=False, default=0)
     status = Column(String, nullable=False, default="active")
     started_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)

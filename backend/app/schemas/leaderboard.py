@@ -1,20 +1,19 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime
+from pydantic import BaseModel, Field
 
-from pydantic import BaseModel, Field# Сохранение результата
+
 class SaveLeaderboardRequest(BaseModel):
     session_id: int
-    player_name: str = Field(min_length=1, max_length=50)
+    player_name: str = Field(min_length=2, max_length=50)
 
 
-# Ответ после сохранения
 class SaveLeaderboardResponse(BaseModel):
     message: str
     leaderboard_entry_id: int
     rank: int
 
 
-# Один элемент рейтинга
 class LeaderboardItem(BaseModel):
     rank: int
     player_name: str
@@ -23,6 +22,13 @@ class LeaderboardItem(BaseModel):
     played_at: datetime
 
 
-# Весь рейтинг
 class LeaderboardResponse(BaseModel):
     items: List[LeaderboardItem]
+
+
+class LeaderboardWithUserResponse(BaseModel):
+    top_5: List[LeaderboardItem]
+    user_rank: Optional[int] = None
+    user_entry: Optional[LeaderboardItem] = None
+    neighbors: List[LeaderboardItem]
+    total_players: int

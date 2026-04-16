@@ -1,13 +1,12 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 
-# Логин администратора
+
 class AdminLoginRequest(BaseModel):
     username: str
     password: str
 
 
-# Создание вопроса
 class QuestionCreateRequest(BaseModel):
     question_text: str
     mode: Literal['capitals', 'countries', 'landmarks']
@@ -19,7 +18,6 @@ class QuestionCreateRequest(BaseModel):
     is_active: bool = True
 
 
-# Редактирование вопроса
 class QuestionUpdateRequest(BaseModel):
     question_text: Optional[str] = None
     mode: Optional[Literal['capitals', 'countries', 'landmarks']] = None

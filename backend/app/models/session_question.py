@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
-from backend.app.db import Base
+from ..db import Base
 
 class SessionQuestion(Base):
     __tablename__ = "session_questions"

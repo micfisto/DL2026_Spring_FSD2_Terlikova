@@ -1,48 +1,48 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from backend.app.models.admin_user import AdminUser
-from backend.app.models.question import Question
+from ..models.admin_user import AdminUser
+from ..models.question import Question
 
-from backend.app.schemas.admin import (
+from ..schemas.admin import (
     AdminLoginRequest,
     QuestionCreateRequest,
     QuestionUpdateRequest
 )
-from backend.app.utils.security import (hash_password, verify_password)
 
+from ..utils.security.password import verify_password, hash_password
+from ..utils.security.jwt import generate_token
+
+
+# ---------------- AUTH ----------------
 
 def admin_login(db: Session, request: AdminLoginRequest):
+
     admin = db.query(AdminUser).filter(
         AdminUser.username == request.username
     ).first()
 
-    if not admin:
+    if not admin or not admin.is_active:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     if not verify_password(request.password, admin.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    token = generate_token(admin)
+
+    admin.token = token
+    db.commit()
+
     return {
         "message": "Login successful",
-        "admin_id": admin.id
+        "token": token
     }
 
-def create_admin(db: Session, username: str, email: str, password: str):
-    admin = AdminUser(
-        username=username,
-        email=email,
-        password=hash_password(password),
-        is_active=True
-    )
 
-    db.add(admin)
-    db.commit()
-    db.refresh(admin)
-
-    return admin
+# ---------------- QUESTIONS ----------------
 
 def create_question(db: Session, request: QuestionCreateRequest):
+
     question = Question(**request.dict())
 
     db.add(question)
@@ -53,13 +53,14 @@ def create_question(db: Session, request: QuestionCreateRequest):
 
 
 def update_question(db: Session, question_id: int, request: QuestionUpdateRequest):
+
     question = db.query(Question).filter(Question.id == question_id).first()
 
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
 
-    for key, value in request.dict(exclude_unset=True).items():
-        setattr(question, key, value)
+    for k, v in request.dict(exclude_unset=True).items():
+        setattr(question, k, v)
 
     db.commit()
     db.refresh(question)
@@ -68,6 +69,7 @@ def update_question(db: Session, question_id: int, request: QuestionUpdateReques
 
 
 def delete_question(db: Session, question_id: int):
+
     question = db.query(Question).filter(Question.id == question_id).first()
 
     if not question:
@@ -77,3 +79,8 @@ def delete_question(db: Session, question_id: int):
     db.commit()
 
     return {"message": "deleted"}
+
+
+def get_all_questions(db: Session):
+
+    return db.query(Question).order_by(Question.id.desc()).all()

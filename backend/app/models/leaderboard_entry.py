@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.app.db import Base
+from ..db import Base
 
 
 class LeaderboardEntry(Base):

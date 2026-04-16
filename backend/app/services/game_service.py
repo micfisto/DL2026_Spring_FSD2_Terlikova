@@ -3,12 +3,12 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from backend.app.models.question import Question
-from backend.app.models.answer import Answer
-from backend.app.models.game_session import GameSession
-from backend.app.models.session_question import SessionQuestion
+from ..models.question import Question
+from ..models.answer import Answer
+from ..models.game_session import GameSession
+from ..models.session_question import SessionQuestion
 
-from backend.app.schemas.game import (
+from ..schemas.game import (
     StartGameRequest,
     StartGameResponse,
     QuestionResponse,
@@ -21,25 +21,54 @@ from backend.app.schemas.game import (
     SubmitAnswerRequest
 )
 
-from backend.app.utils.calculate_distance import calculate_distance_km
-from backend.app.utils.calculate_points import calculate_points
-
-from backend.app.utils.validators import (
-    validate_question_belongs_to_session,
-    check_answer_already_exists
-)
-from backend.app.services.game_helpers import (
-    get_session_or_404,
-    check_session_active,
-    get_current_session_question,
-    get_question_by_id,
-    get_question_by_order_index,
-    is_last_question
-)
+from ..utils.math.distance import calculate_distance_km
+from ..utils.math.scoring import calculate_points
+from ..utils.geo.country import point_in_country
 
 
-# Начать новую игровую сессию
-def start_game(db: Session, request: StartGameRequest) -> StartGameResponse:
+# ---------------- helpers ----------------
+
+def _session(db: Session, session_id: int):
+    session = db.query(GameSession).filter(GameSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Сессия не найдена")
+    return session
+
+
+def _answered_count(db: Session, session_id: int):
+    return db.query(Answer).filter(Answer.session_id == session_id).count()
+
+
+def _question(db: Session, session_id: int, index: int):
+    sq = db.query(SessionQuestion).filter(
+        SessionQuestion.session_id == session_id,
+        SessionQuestion.order_index == index
+    ).first()
+
+    if not sq:
+        return None
+
+    return db.query(Question).filter(Question.id == sq.question_id).first()
+
+
+def _format(q: Question) -> QuestionResponse:
+    return QuestionResponse(
+        question_id=q.id,
+        text=q.question_text,
+        target_type=q.target_type,
+        target_name=q.target_name,
+        correct_country_code=q.target_name if q.target_type == "country" else None
+    )
+
+
+def _is_last(db: Session, session: GameSession):
+    return _answered_count(db, session.id) >= session.total_questions
+
+
+# ---------------- core ----------------
+
+def start_game(db: Session, request: StartGameRequest):
+
     questions = (
         db.query(Question)
         .filter(
@@ -52,14 +81,13 @@ def start_game(db: Session, request: StartGameRequest) -> StartGameResponse:
         .all()
     )
 
-    if len(questions) < request.question_count:
-        raise HTTPException(status_code=400, detail="Недостаточно вопросов")
+    if not questions:
+        raise HTTPException(status_code=400, detail="Нет вопросов")
 
     session = GameSession(
         mode=request.mode,
         difficulty=request.difficulty,
-        total_questions=request.question_count,
-        current_question_index=0,
+        total_questions=len(questions),
         score=0,
         status="active",
         started_at=datetime.datetime.utcnow()
@@ -77,164 +105,153 @@ def start_game(db: Session, request: StartGameRequest) -> StartGameResponse:
 
     db.commit()
 
-    first_question = questions[0]
+    first = _question(db, session.id, 0)
 
     return StartGameResponse(
         session_id=session.id,
-        question=QuestionResponse(
-            question_id=first_question.id,
-            text=first_question.question_text,
-            target_type=first_question.target_type
-        ),
-        progress=ProgressResponse(
-            current=1,
-            total=session.total_questions),
-        score=session.score
+        question=_format(first),
+        progress=ProgressResponse(current=1, total=len(questions)),
+        score=0
     )
 
 
-# Получить текущий вопрос игры
-def get_current_question(db: Session, session_id: int) -> NextQuestionResponse:
-    session = get_session_or_404(db, session_id)
-    check_session_active(session)
+def get_current_question(db: Session, session_id: int):
 
-    question = get_current_session_question(db, session)
+    session = _session(db, session_id)
+
+    index = _answered_count(db, session_id)
+    q = _question(db, session_id, index)
+
+    if not q:
+        raise HTTPException(status_code=404, detail="Вопрос не найден")
 
     return NextQuestionResponse(
-        question=QuestionResponse(
-            question_id=question.id,
-            text=question.question_text,
-            target_type=question.target_type
-        ),
-        progress=ProgressResponse(
-            current=session.current_question_index + 1,
-            total=session.total_questions
-        ),
+        question=_format(q),
+        progress=ProgressResponse(current=index + 1, total=session.total_questions),
         score=session.score
     )
 
 
-# Отправить ответ на вопрос
 def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
-    session = get_session_or_404(db, session_id)
-    check_session_active(session)
 
-    validate_question_belongs_to_session(db, session_id, request.question_id)
+    session = _session(db, session_id)
 
-    if check_answer_already_exists(db, session_id, request.question_id):
-        raise HTTPException(status_code=400, detail="Уже отвечали")
+    index = _answered_count(db, session_id)
+    q = _question(db, session_id, index)
 
-    question = get_question_by_order_index(db, session, session.current_question_index)
+    if not q or q.id != request.question_id:
+        raise HTTPException(status_code=400, detail="Неверный вопрос")
 
-    if not question or question.id != request.question_id:
-        raise HTTPException(status_code=400, detail="Нельзя отвечать не на текущий вопрос")
+    distance = None
+    points = 0
 
-    distance = calculate_distance_km(
-        request.selected_lat,
-        request.selected_lng,
-        question.correct_lat,
-        question.correct_lng
-    )
+    if q.target_type == "country":
 
-    points = calculate_points(distance)
+        ok = point_in_country(
+            request.selected_lat,
+            request.selected_lng,
+            q.target_name
+        )
 
-    answer = Answer(
+        if ok:
+            points = 1000
+            distance = 0
+        else:
+            distance = calculate_distance_km(
+                request.selected_lat,
+                request.selected_lng,
+                q.correct_lat,
+                q.correct_lng
+            )
+            points = calculate_points(distance)
+
+    else:
+        distance = calculate_distance_km(
+            request.selected_lat,
+            request.selected_lng,
+            q.correct_lat,
+            q.correct_lng
+        )
+        points = calculate_points(distance)
+
+    db.add(Answer(
         session_id=session.id,
-        question_id=question.id,
+        question_id=q.id,
         selected_lat=request.selected_lat,
         selected_lng=request.selected_lng,
         distance_km=distance,
         points_earned=points,
         answered_at=datetime.datetime.utcnow()
-    )
+    ))
 
-    db.add(answer)
     session.score += points
-
-    is_last = is_last_question(session)
-
     db.commit()
 
     return SubmitAnswerResponse(
-        question_id=question.id,
-        correct_lat=question.correct_lat,
-        correct_lng=question.correct_lng,
+        question_id=q.id,
+        correct_lat=q.correct_lat,
+        correct_lng=q.correct_lng,
         distance_km=distance,
         points_earned=points,
         total_score=session.score,
-        is_last_question=is_last
+        is_last_question=_is_last(db, session)
     )
 
 
-# Перейти к следующему вопросу
 def get_next_question(db: Session, session_id: int):
-    session = get_session_or_404(db, session_id)
-    check_session_active(session)
 
-    session.current_question_index += 1
+    session = _session(db, session_id)
 
-    if session.current_question_index >= session.total_questions:
+    next_index = _answered_count(db, session_id) + 1
+
+    if next_index >= session.total_questions:
         session.status = "finished"
         session.finished_at = datetime.datetime.utcnow()
         db.commit()
 
         return GameFinishedResponse(final_score=session.score)
 
-    question = get_question_by_order_index(db, session, session.current_question_index)
-
-    if not question:
-        raise HTTPException(status_code=404, detail="Вопрос не найден")
+    q = _question(db, session_id, next_index)
 
     db.commit()
 
     return NextQuestionResponse(
-        question=QuestionResponse(
-            question_id=question.id,
-            text=question.question_text,
-            target_type=question.target_type
-        ),
-        progress=ProgressResponse(
-            current=session.current_question_index + 1,
-            total=session.total_questions
-        ),
+        question=_format(q),
+        progress=ProgressResponse(current=next_index + 1, total=session.total_questions),
         score=session.score
     )
 
 
-# Досрочно завершить игру
 def finish_game(db: Session, session_id: int):
-    session = get_session_or_404(db, session_id)
+
+    session = _session(db, session_id)
 
     session.status = "finished"
     session.finished_at = datetime.datetime.utcnow()
-
-    answered = db.query(Answer).filter(Answer.session_id == session.id).count()
 
     db.commit()
 
     return FinishGameResponse(
         session_id=session.id,
         status=session.status,
-        answered_questions=answered,
+        answered_questions=_answered_count(db, session_id),
         total_questions=session.total_questions,
         final_score=session.score
     )
 
 
-# Получить результаты завершённой игры
 def get_game_result(db: Session, session_id: int):
-    session = get_session_or_404(db, session_id)
+
+    session = _session(db, session_id)
 
     if session.status != "finished":
         raise HTTPException(status_code=400, detail="Игра не завершена")
-
-    answered = db.query(Answer).filter(Answer.session_id == session.id).count()
 
     return GameResultResponse(
         session_id=session.id,
         mode=session.mode,
         final_score=session.score,
-        answered_questions=answered,
+        answered_questions=_answered_count(db, session_id),
         total_questions=session.total_questions,
         finished_at=session.finished_at
     )
