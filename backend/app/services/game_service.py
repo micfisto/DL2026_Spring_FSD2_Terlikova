@@ -202,7 +202,7 @@ def get_next_question(db: Session, session_id: int):
 
     session = _session(db, session_id)
 
-    next_index = _answered_count(db, session_id) + 1
+    next_index = _answered_count(db, session_id)
 
     if next_index >= session.total_questions:
         session.status = "finished"
