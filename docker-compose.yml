@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: geoquiz-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: geoquiz
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: geoquiz-backend
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/geoquiz
+      - SUPABASE_PUBLISHABLE_KEY=
+      - SUPABASE_SECRET_KEY=
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://backend:8000
+    container_name: geoquiz-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:

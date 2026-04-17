@@ -1,0 +1,25 @@
+.card {
+  background: #1a1d24;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  background: #2a2d34;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  border-bottom: 1px solid #3a3d44;
+}
+
+.card-body {
+  padding: 20px;
+  color: white;
+}

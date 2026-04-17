@@ -1,0 +1,46 @@
+.footer {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-icon {
+    font-size: 1.25rem;
+}
+
+.footer-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-copy {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}

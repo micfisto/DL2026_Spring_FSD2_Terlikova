@@ -1,0 +1,63 @@
+/* ============================================
+   GLOBAL LAYOUT STYLES
+   ============================================ */
+
+/* ---------- Body ---------- */
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* ---------- Root Container ---------- */
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* ---------- Layout Containers ---------- */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.container-narrow {
+  max-width: 800px;
+}
+
+.container-wide {
+  max-width: 1400px;
+}
+
+/* ---------- Global Utilities ---------- */
+.error {
+  background: #ff4d4f;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.loading {
+  padding: 20px;
+  color: #aaa;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+  }
+}

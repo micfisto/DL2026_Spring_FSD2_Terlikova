@@ -1,0 +1,21 @@
+.layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #0f0f1a;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.page-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
