@@ -55,10 +55,10 @@ export default function Home() {
                     </div>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && <div className="home-error-message">{error}</div>}
 
                 <button
-                    className="start-button"
+                    className="home-start-button"
                     onClick={handleContinue}
                 >
                     <span>🚀</span>

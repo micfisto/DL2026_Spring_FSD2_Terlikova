@@ -17,7 +17,7 @@ export default function Results() {
     const [entryId, setEntryId] = useState(null);
 
     const score = state.finalScore || 0;
-    const maxScore = 500;
+    const maxScore = 5000;
     const percentage = maxScore ? (score / maxScore) * 100 : 0;
 
     useEffect(() => {
@@ -103,6 +103,12 @@ export default function Results() {
                     />
                 </div>
 
+                {saved && leaderboardData && !leaderboardData.user_rank && (
+                    <div className="top-five-notice">
+                        🎉 Вы в топ-5!
+                    </div>
+                )}
+
                 {!saved ? (
                     <div className="results-form">
                         <input
@@ -123,7 +129,6 @@ export default function Results() {
                     </div>
                 ) : (
                     <div className="results-success">
-                        <span>✅</span>
                         <span>Результат сохранён!</span>
                     </div>
                 )}
@@ -134,36 +139,7 @@ export default function Results() {
                     </div>
                 )}
 
-                {leaderboardData && !leaderboardLoading && (
-                    <div className="leaderboard-display">
-                        <h3>Таблица лидеров</h3>
-
-                        {!leaderboardData.user_rank && (
-                            <div className="leaderboard-top">
-                                <h4>Топ-5</h4>
-
-                                <ol className="leaderboard-list">
-                                    {leaderboardData.top_5?.map((item) => (
-                                        <li
-                                            key={item.rank}
-                                            className="leaderboard-item"
-                                        >
-                                            <span className="rank">
-                                                #{item.rank}
-                                            </span>
-                                            <span className="name">
-                                                {item.player_name}
-                                            </span>
-                                            <span className="score">
-                                                {item.score}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ol>
-                            </div>
-                        )}
-
-                        {leaderboardData.user_rank && (
+                {leaderboardData && !leaderboardLoading && leaderboardData.user_rank && (
                             <div className="leaderboard-user">
                                 <div className="your-position">
                                     <span>Ваша позиция: </span>
@@ -201,8 +177,6 @@ export default function Results() {
                                     </ul>
                                 </div>
                             </div>
-                        )}
-                    </div>
                 )}
 
                 {error && (

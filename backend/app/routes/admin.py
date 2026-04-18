@@ -17,7 +17,7 @@ from ..schemas.admin import (
     QuestionUpdateRequest
 )
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
 
 @router.post("/login")

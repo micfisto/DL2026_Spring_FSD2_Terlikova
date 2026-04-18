@@ -55,3 +55,12 @@ export const defaultIcon = new L.Icon({
     iconSize: [25, 41],
     iconAnchor: [12, 41],
 });
+
+export const orangeIcon = new L.Icon({
+    iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png",
+    shadowUrl:
+        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});

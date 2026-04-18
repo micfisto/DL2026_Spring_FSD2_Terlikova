@@ -1,68 +1,74 @@
 .btn {
   padding: 10px 16px;
-  border-radius: 10px;
-  border: none;
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
+
   font-size: 16px;
   font-weight: 500;
-  transition: all 0.2s ease;
+
+  color: #eae0d5;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
+  transition: all 0.25s ease;
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(230, 220, 200, 0.3);
 }
 
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(135deg, rgb(55, 78, 88), rgb(43, 63, 71));
+  border: none;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(156, 141, 127, 0.4);
 }
 
 .btn-secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #4b5563;
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .btn-success {
-  background: #10b981;
-  color: white;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
 }
 
 .btn-success:hover:not(:disabled) {
-  background: #059669;
-  transform: scale(1.05);
+  background: rgba(16, 185, 129, 0.25);
 }
 
 .btn-danger {
-  background: #ef4444;
-  color: white;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #dc2626;
-  transform: scale(1.05);
+  background: rgba(239, 68, 68, 0.25);
 }
 
 .btn-warning {
-  background: #f59e0b;
-  color: white;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
 }
 
 .btn-warning:hover:not(:disabled) {
-  background: #d97706;
-  transform: scale(1.05);
+  background: rgba(245, 158, 11, 0.25);
 }

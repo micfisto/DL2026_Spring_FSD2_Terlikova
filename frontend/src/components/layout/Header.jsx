@@ -10,7 +10,6 @@ export default function Header() {
                     <span className="logo-text">GeoQuiz</span>
                 </Link>
                 <nav className="nav">
-                    <Link to="/" className="nav-link">Главная</Link>
                     <Link to="/leaderboard" className="nav-link">Рейтинг</Link>
                 </nav>
             </div>

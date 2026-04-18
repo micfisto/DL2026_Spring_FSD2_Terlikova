@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MapView from "../components/map/MapView";
 import { useGameStore } from "../store/gameStore";
 import { useTimer } from "../hooks/useTimer";
+import "./Game.css";
 
 export default function Game() {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ export default function Game() {
   const mode = useGameStore((s) => s.mode);
   const difficulty = useGameStore((s) => s.difficulty);
 
-  // 🔒 ЛОК ОТ ГОНКИ
   const lockRef = useRef(false);
 
   const getTimeForDifficulty = (diff) => {
@@ -33,7 +33,6 @@ export default function Game() {
 
   const timeForDifficulty = getTimeForDifficulty(difficulty);
 
-  // 🔥 FIX: безопасный question id
   const questionId = question?.question_id ?? question?.id;
 
   const handleTimeUp = useCallback(() => {
@@ -62,19 +61,17 @@ export default function Game() {
     }
   };
 
-  // 🔥 FIX: строгий контроль таймера
   useEffect(() => {
     if (!question || result || loading) {
       timer.stop();
       return;
     }
 
-    lockRef.current = false; // сброс при новом вопросе
+    lockRef.current = false;
     timer.reset?.();
     timer.start();
   }, [questionId, result, loading]);
 
-  // 🔥 FIX: защита MapView от undefined
   const correctPoint = useMemo(() => {
     const lat = result?.correctLat ?? result?.correct_lat;
     const lng = result?.correctLng ?? result?.correct_lng;
@@ -85,60 +82,65 @@ export default function Game() {
   }, [result]);
 
   if (!question && !result) {
-    return <div className="loading">Игра не загружена</div>;
+    return <div className="game-loading">Игра не загружена</div>;
   }
 
   return (
-    <div className="game-layout">
-      <div className="hud">
-        <h2>{question?.text}</h2>
-        <div>Score: {score}</div>
+    <div className="game">
+      <div className="game-layout">
+        <div className="hud">
+          <h2>{question?.text}</h2>
+          <div>Score: {score}</div>
 
-        <div className={`timer ${timer.timeLeft <= 11 ? "timer-warning" : ""}`}>
-          Time: {timer.timeLeft}s
+          <div className={`timer ${timer.timeLeft <= 11 ? "timer-warning" : ""}`}>
+            Time: {timer.timeLeft}s
+          </div>
         </div>
-      </div>
 
-      {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message">{error}</div>}
 
-      <MapView
-        correctPoint={correctPoint}
-        showResult={!!result}
-        mode={mode}
-        targetCode={question?.target_name}
-      />
-
-      {result && (
-        <div className="answer-result">
-          <p>Расстояние: {result.distance_km} км</p>
-          <p>Очков: +{result.points_earned}</p>
+        <div className="map-container">
+          <MapView
+            correctPoint={correctPoint}
+            showResult={!!result}
+            mode={mode}
+            targetCode={question?.target_name}
+            selectedPoint={selectedPoint}
+          />
         </div>
-      )}
-
-      <div className="controls">
-        <button
-          disabled={!selectedPoint || loading || result}
-          onClick={() => {
-            if (lockRef.current) return;
-            lockRef.current = true;
-
-            timer.stop();
-            answer().finally(() => {
-              lockRef.current = false;
-            });
-          }}
-        >
-          {loading ? "Отправка..." : "Ответить"}
-        </button>
 
         {result && (
-          <button
-            onClick={handleNext}
-            disabled={loading}
-          >
-            Далее
-          </button>
+          <div className="answer-result">
+            <p>Расстояние: {result.distance_km} км</p>
+            <p>Очков: +{result.points_earned}</p>
+          </div>
         )}
+
+        <div className="controls">
+          <button
+            disabled={!selectedPoint || loading || result}
+            onClick={() => {
+              if (lockRef.current) return;
+              lockRef.current = true;
+
+              timer.stop();
+              answer().finally(() => {
+                lockRef.current = false;
+              });
+            }}
+          >
+            {loading ? "Отправка..." : "Ответить"}
+          </button>
+
+          {result && (
+            <button
+              onClick={handleNext}
+              disabled={loading}
+            >
+              Далее
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

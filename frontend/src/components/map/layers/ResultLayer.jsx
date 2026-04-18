@@ -4,7 +4,6 @@ import { greenIcon } from "../icons";
 export default function ResultLayer({
     selected,
     correctPoint,
-    mode,
     showResult,
 }) {
     if (!showResult) return null;
@@ -19,12 +18,6 @@ export default function ResultLayer({
 
     return (
         <>
-            {selected && (
-                <Marker position={selected}>
-                    <Popup>Ваш ответ</Popup>
-                </Marker>
-            )}
-
             {correctPoint && (
                 <Marker position={correctPoint} icon={greenIcon}>
                     <Popup>Правильный ответ</Popup>

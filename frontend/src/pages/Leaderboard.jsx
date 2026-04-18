@@ -3,32 +3,50 @@ import { leaderboardAPI } from "../api/leaderboard.api";
 import { useGameStore } from "../store/gameStore";
 import "./Leaderboard.css";
 
+const MODES = ["capitals", "countries", "landmarks"];
+
 export default function Leaderboard() {
-    const [leaderboard, setLeaderboard] = useState([]);
+    const [activeMode, setActiveMode] = useState("capitals");
+    const [leaderboards, setLeaderboards] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const gameState = useGameStore.getState();
-    const mode = gameState.mode || "capitals";
+    const defaultMode = gameState.mode || "capitals";
 
     useEffect(() => {
-        loadLeaderboard();
-    }, [mode]);
+        setActiveMode(defaultMode);
+    }, [defaultMode]);
 
-    const loadLeaderboard = async () => {
+    useEffect(() => {
+        loadAllLeaderboards();
+    }, []);
+
+    const loadAllLeaderboards = async () => {
         try {
             setLoading(true);
-            const data = await leaderboardAPI.getLeaderboard(mode);
-            console.log("Leaderboard API response:", data);
-            // API возвращает { items: [...] }
-            setLeaderboard(data.items || []);
+            const results = {};
+            
+            for (const mode of MODES) {
+                try {
+                    const data = await leaderboardAPI.getLeaderboard(mode);
+                    results[mode] = data.items || [];
+                } catch (err) {
+                    console.error(`Error loading ${mode} leaderboard:`, err);
+                    results[mode] = [];
+                }
+            }
+            
+            setLeaderboards(results);
         } catch (err) {
-            console.error("Error loading leaderboard:", err);
+            console.error("Error loading leaderboards:", err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+
+    const leaderboard = leaderboards[activeMode] || [];
 
     if (loading) {
         return (
@@ -47,49 +65,64 @@ export default function Leaderboard() {
         );
     }
 
-    if (!leaderboard.length) {
-        return (
-            <div className="leaderboard-empty">
-                <p>Пока нет результатов. Будь первым!</p>
-            </div>
-        );
-    }
-
     return (
         <div className="leaderboard-container">
             <h2 className="leaderboard-title">🏆 Таблица лидеров</h2>
-            <p className="leaderboard-mode">Режим: {getModeLabel(mode)}</p>
+            
+            <div className="leaderboard-tabs">
+                {MODES.map((mode) => (
+                    <button
+                        key={mode}
+                        className={`leaderboard-tab ${activeMode === mode ? 'active' : ''}`}
+                        onClick={() => setActiveMode(mode)}
+                    >
+                        {getModeLabel(mode)}
+                    </button>
+                ))}
+            </div>
 
-            <table className="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Место</th>
-                        <th>Игрок</th>
-                        <th>Очки</th>
-                        <th>Дата</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {leaderboard.map((entry, index) => (
-                        <tr
-                            key={entry.id || index}
-                            className={`leaderboard-row ${index < 3 ? 'top-three' : ''}`}
-                        >
-                            <td className="leaderboard-rank">
-                                {index === 0 && <span className="rank-badge gold">🥇</span>}
-                                {index === 1 && <span className="rank-badge silver">🥈</span>}
-                                {index === 2 && <span className="rank-badge bronze">🥉</span>}
-                                {index > 2 && <span className="rank-number">{index + 1}</span>}
-                            </td>
-                            <td className="leaderboard-name">{entry.player_name}</td>
-                            <td className="leaderboard-score">{entry.score}</td>
-                            <td className="leaderboard-date">
-                                {formatDate(entry.played_at)}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {!leaderboard.length ? (
+                <div className="leaderboard-empty">
+                    <p>В категории "{getModeLabel(activeMode)}" пока нет результатов. Будь первым!</p>
+                </div>
+            ) : (
+                <>
+                    <p className="leaderboard-mode">{getModeLabel(activeMode)}</p>
+
+                    <div className="leaderboard-table-container">
+                        <table className="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th className="leaderboard-rank">Место</th>
+                                    <th className="leaderboard-name">Игрок</th>
+                                    <th className="leaderboard-score">Очки</th>
+                                    <th className="leaderboard-date">Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {leaderboard.slice(0, 5).map((entry, index) => (
+                                    <tr
+                                        key={entry.id || index}
+                                        className={`leaderboard-row ${index < 3 ? 'top-three' : ''}`}
+                                    >
+                                        <td className="leaderboard-rank">
+                                            {index === 0 && <span className="rank-badge gold">🥇</span>}
+                                            {index === 1 && <span className="rank-badge silver">🥈</span>}
+                                            {index === 2 && <span className="rank-badge bronze">🥉</span>}
+                                            {index > 2 && <span className="rank-number">{index + 1}</span>}
+                                        </td>
+                                        <td className="leaderboard-name">{entry.player_name}</td>
+                                        <td className="leaderboard-score">{entry.score}</td>
+                                        <td className="leaderboard-date">
+                                            {formatDate(entry.played_at)}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

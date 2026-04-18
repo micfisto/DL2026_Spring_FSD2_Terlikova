@@ -1,166 +1,184 @@
-/* ============================================
-   LEADERBOARD PAGE STYLES
-   ============================================ */
-
 .leaderboard-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 500px;
 }
 
 .leaderboard-title {
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  color: var(--text-h);
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #eae0d5;
 }
 
 .leaderboard-mode {
-  text-align: center;
-  color: var(--text);
-  margin-bottom: 2rem;
-  font-size: 1rem;
+    text-align: center;
+    color: #eae0d5;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
 }
 
-/* ---------- Table Styles ---------- */
+/* tabs */
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.leaderboard-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #eae0d5;
+}
+
+.leaderboard-tab.active {
+    background: linear-gradient(135deg, rgb(55, 78, 88) 0%, rgb(43, 63, 71) 100%);
+    border: 1px solid #eae0d5;
+    box-shadow: 0 0 5px #9c8d7f;
+}
+
+.tab-empty-badge {
+    display: inline-block;
+    margin-left: 4px;
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+}
+
+/* table container */
+.leaderboard-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* scrollbar */
+.leaderboard-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaderboard-table-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.leaderboard-table-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.leaderboard-table-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(23, 41, 51);
+}
+
 .leaderboard-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.leaderboard-table thead {
-  background: rgba(255, 255, 255, 0.05);
+.leaderboard-table th,
+.leaderboard-table td {
+    text-align: center;
+    font-weight: 500;
+    color: #eae0d5;
+    vertical-align: middle;
+    padding: 1rem 0.5rem;
 }
 
 .leaderboard-table th {
-  padding: 1rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.leaderboard-table th:last-child,
-.leaderboard-table td:last-child {
-  text-align: right;
+    padding: 1rem 0.5rem;
+    vertical-align: middle;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .leaderboard-table td {
-  padding: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .leaderboard-row {
-  transition: all 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .leaderboard-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .leaderboard-row.top-three {
-  background: rgba(102, 126, 234, 0.1);
+    background: rgba(102, 126, 234, 0.1);
 }
 
 .leaderboard-row.top-three:hover {
-  background: rgba(102, 126, 234, 0.15);
+    background: rgb(23, 41, 51);
 }
 
-/* ---------- Rank Column ---------- */
-.leaderboard-rank {
-  width: 80px;
-  font-weight: 600;
-}
-
-.rank-badge {
-  font-size: 1.5rem;
-}
-
-.rank-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
-}
-
-/* ---------- Name Column ---------- */
-.leaderboard-name {
-  font-weight: 500;
-}
-
-/* ---------- Score Column ---------- */
-.leaderboard-score {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: var(--accent);
-}
-
-/* ---------- Date Column ---------- */
-.leaderboard-date {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* ---------- Loading State ---------- */
 .leaderboard-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text);
 }
 
 .leaderboard-loading .loading-spinner {
-  font-size: 2rem;
-  animation: spin 1s linear infinite;
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .leaderboard-loading p {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
-/* ---------- Error State ---------- */
 .leaderboard-error {
-  padding: 2rem;
-  text-align: center;
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 12px;
 }
 
-/* ---------- Empty State ---------- */
 .leaderboard-empty {
-  padding: 3rem;
-  text-align: center;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 3rem;
+    text-align: center;
+    color: #8a969c;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .leaderboard-empty p {
-  font-size: 1.125rem;
+    font-size: 1.125rem;
+    margin: 0;
 }

@@ -29,29 +29,29 @@ export default function AdminLogin() {
     return (
         <div className="admin-login">
             <div className="admin-login-container">
+
                 <div className="admin-login-header">
                     <h1>🔐 Админ-панель</h1>
                     <p>Вход для администратора</p>
                 </div>
 
                 <form className="admin-login-form" onSubmit={handleSubmit}>
+
                     <div className="form-group">
-                        <label htmlFor="username">Имя пользователя</label>
+                        <label>Имя пользователя</label>
                         <Input
-                            id="username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Введите имя пользователя"
+                            placeholder="Введите логин"
                             required
                             autoComplete="username"
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">Пароль</label>
+                        <label>Пароль</label>
                         <Input
-                            id="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -62,12 +62,13 @@ export default function AdminLogin() {
                     </div>
 
                     {error && (
-                        <div className="error-message">{error}</div>
+                        <div className="error-message">
+                            {error}
+                        </div>
                     )}
 
                     <Button
                         type="submit"
-                        variant="primary"
                         loading={loading}
                         disabled={loading}
                         className="login-button"
@@ -79,6 +80,7 @@ export default function AdminLogin() {
                 <div className="admin-login-footer">
                     <a href="/">← Вернуться на главную</a>
                 </div>
+
             </div>
         </div>
     );

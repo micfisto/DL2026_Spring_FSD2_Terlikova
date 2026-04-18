@@ -5,6 +5,7 @@ import { useGameStore } from "../../store/gameStore";
 import ClickLayer from "./layers/ClickLayer";
 import CountryLayer from "./layers/CountryLayer";
 import ResultLayer from "./layers/ResultLayer";
+import MarkersLayer from "./layers/MarkersLayer";
 
 import { loadCountriesGeoJSON, findCountryAtPoint } from "../../utils/geoUtils";
 
@@ -13,8 +14,10 @@ export default function MapView({
     showResult,
     mode,
     targetCode,
+    selectedPoint,
 }) {
-    const selected = useGameStore((s) => s.selectedPoint);
+    const storeSelected = useGameStore((s) => s.selectedPoint);
+    const selected = selectedPoint || storeSelected;
 
     const [geoData, setGeoData] = useState(null);
 
@@ -66,6 +69,13 @@ export default function MapView({
                 correctPoint={correctPoint}
                 mode={mode}
                 showResult={showResult}
+            />
+
+            <MarkersLayer
+                selected={selected}
+                showResult={showResult}
+                mode={mode}
+                isCorrect={isCorrect}
             />
         </MapContainer>
     );

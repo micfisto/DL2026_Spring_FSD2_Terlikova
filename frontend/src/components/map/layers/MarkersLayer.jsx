@@ -1,9 +1,10 @@
 import { Marker } from "react-leaflet";
 import {
     defaultIcon,
+    orangeIcon,
     redIcon,
     goldIcon,
-} from "../icons/mapIcons";
+} from "../icons";
 
 export default function MarkersLayer({
     selected,
@@ -13,16 +14,22 @@ export default function MarkersLayer({
 }) {
     if (!selected) return null;
 
+    const getIcon = () => {
+        if (!showResult) {
+            return orangeIcon;
+        }
+        
+        if (mode === "countries") {
+            return isCorrect ? goldIcon : redIcon;
+        }
+        
+        return defaultIcon;
+    };
+
     return (
         <Marker
             position={selected}
-            icon={
-                mode === "countries" && showResult
-                    ? isCorrect
-                        ? goldIcon
-                        : redIcon
-                    : defaultIcon
-            }
+            icon={getIcon()}
         />
     );
 }

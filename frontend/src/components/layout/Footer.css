@@ -1,16 +1,16 @@
 .footer {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.5rem 0;
+    background: linear-gradient(135deg, #1e3039 0%, #293b42 100%);
+    border-top: 2px solid rgba(255, 255, 255, 0.15);
+    padding: 1.25rem 0;
     margin-top: auto;
 }
 
 .footer-content {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
@@ -19,22 +19,12 @@
 .footer-brand {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-}
-
-.footer-icon {
-    font-size: 1.25rem;
-}
-
-.footer-text {
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    gap: 1rem;
 }
 
 .footer-copy {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.875rem;
+    color: #7e8f91;
+    font-size: 0.7rem;
     margin: 0;
 }
 

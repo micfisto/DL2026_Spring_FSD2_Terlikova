@@ -11,10 +11,12 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    min-height: 100%;
 }
 
 body {
     line-height: 145%;
+    min-height: 100vh;
 }
 
 img,
@@ -79,7 +81,9 @@ button {
     --mono: ui-monospace, Consolas, monospace;
 
     /* Base Font Size */
-    font: 18px/145% var(--sans);
+    font-size: 18px;
+    font-family: var(--sans);
+    line-height: 145%;
     letter-spacing: 0.18px;
     color-scheme: light dark;
     color: var(--text);

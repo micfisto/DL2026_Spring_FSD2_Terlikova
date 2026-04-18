@@ -40,7 +40,7 @@ export default function DifficultyScreen() {
         { 
             value: "easy", 
             label: "Легкий", 
-            icon: "🐢", 
+            icon: "🔥",
             desc: "Больше времени, крупные регионы",
             time: "60 сек",
             score: "x1"
@@ -48,7 +48,7 @@ export default function DifficultyScreen() {
         { 
             value: "medium", 
             label: "Средний", 
-            icon: "🦊", 
+            icon: "🔥🔥",
             desc: "Баланс времени и сложности",
             time: "30 сек",
             score: "x1.5"
@@ -56,7 +56,7 @@ export default function DifficultyScreen() {
         { 
             value: "hard", 
             label: "Сложный", 
-            icon: "🐉", 
+            icon: "🔥🔥🔥",
             desc: "Мало времени, все регионы",
             time: "15 сек",
             score: "x2"
@@ -101,15 +101,15 @@ export default function DifficultyScreen() {
                 ))}
             </div>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="difficulty-error-message">{error}</div>}
 
             <button
-                className="start-button"
+                className="difficulty-screen-start-button"
                 onClick={handleStart}
                 disabled={loading}
             >
                 {loading ? (
-                    <span className="loading-spinner">⏳</span>
+                    <span className="difficulty-loading-spinner">⏳</span>
                 ) : (
                     <>
                         <span>🚀</span>
