@@ -186,15 +186,6 @@ h1.hero-title {
     animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 @media (max-width: 600px) {
     .hero-title {
         font-size: 2.5rem;

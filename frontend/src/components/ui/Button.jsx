@@ -3,6 +3,7 @@ import './Button.css';
 const Button = ({
   children,
   variant = 'primary',
+   size = 'medium',
   disabled = false,
   loading = false,
   onClick,
@@ -19,7 +20,7 @@ const Button = ({
   return (
     <button
       type={type}
-      className={`btn btn-${variant} ${className}`}
+      className={`btn btn-${variant} btn-${size} ${className}`}
       disabled={disabled || loading}
       onClick={handleClick}
       {...props}

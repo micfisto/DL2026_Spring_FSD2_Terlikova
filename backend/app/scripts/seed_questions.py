@@ -116,11 +116,67 @@ def generate_landmarks():
     return questions
 
 
+def generate_test_questions():
+    """Generate test questions for UI edge cases."""
+    return [
+        {
+            "question_text": "В какой стране находится очень длинное и специально перегруженное название достопримечательности, которое должно проверить, как интерфейс справляется с переполнением текста и переносами строк в карточке?",
+            "target_type": "country",
+            "target_name": "Япония",
+            "correct_lat": 35.6762,
+            "correct_lng": 139.6503,
+            "mode": "countries",
+            "difficulty": "medium",
+            "is_active": True
+        },
+        {
+            "question_text": "Где находится точка с экстремальными координатами?",
+            "target_type": "landmark",
+            "target_name": "Null Island",
+            "correct_lat": 0.0,
+            "correct_lng": 0.0,
+            "mode": "landmarks",
+            "difficulty": "easy",
+            "is_active": True
+        },
+        {
+            "question_text": "Где находится Сиднейский оперный театр?",
+            "target_type": "landmark",
+            "target_name": "Сиднейский оперный театр",
+            "correct_lat": -33.8568,
+            "correct_lng": 151.2153,
+            "mode": "landmarks",
+            "difficulty": "easy",
+            "is_active": True
+        },
+        {
+            "question_text": "Редактируемый тестовый вопрос (проверь edit flow)",
+            "target_type": "country",
+            "target_name": "Франция",
+            "correct_lat": 48.8566,
+            "correct_lng": 2.3522,
+            "mode": "capitals",
+            "difficulty": "hard",
+            "is_active": True
+        },
+        {
+            "question_text": "Скрытый вопрос для проверки состояния UI",
+            "target_type": "capital",
+            "target_name": "Германия",
+            "correct_lat": 52.52,
+            "correct_lng": 13.405,
+            "mode": "capitals",
+            "difficulty": "medium",
+            "is_active": False
+        },
+    ]
+
 def generate_all_questions():
     all_q = (
             generate_capitals() +
             generate_countries() +
-            generate_landmarks()
+            generate_landmarks() +
+            generate_test_questions()
     )
 
     seen = set()

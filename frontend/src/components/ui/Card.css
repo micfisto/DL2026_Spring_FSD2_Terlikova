@@ -13,13 +13,16 @@
 .card-header {
   background: #2a2d34;
   padding: 16px 20px;
-  font-size: 18px;
+  font-size: 18px ;
   font-weight: 600;
-  color: white;
+  color: #eae0d5;
   border-bottom: 1px solid #3a3d44;
 }
 
 .card-body {
   padding: 20px;
-  color: white;
+  color: #eae0d5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }

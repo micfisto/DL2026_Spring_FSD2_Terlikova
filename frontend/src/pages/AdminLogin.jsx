@@ -46,6 +46,7 @@ export default function AdminLogin() {
                             placeholder="Введите логин"
                             required
                             autoComplete="username"
+                            maxLength={50}
                         />
                     </div>
 
@@ -58,6 +59,7 @@ export default function AdminLogin() {
                             placeholder="Введите пароль"
                             required
                             autoComplete="current-password"
+                            maxLength={100}
                         />
                     </div>
 

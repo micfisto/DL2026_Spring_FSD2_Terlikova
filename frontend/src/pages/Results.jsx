@@ -117,6 +117,7 @@ export default function Results() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             disabled={loading}
+                            maxLength={50}
                         />
 
                         <button

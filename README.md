@@ -15,12 +15,11 @@
 ## Технологический стек
 
 | Компонент | Технологии |
-|----------|------------|
-| Frontend | React, Vite, Leaflet (react-leaflet), CSS Modules |
-| Backend | Python, FastAPI, SQLAlchemy |
-| База данных | PostgreSQL (локально через Docker или Supabase) |
+|-----------|------------|
+| Frontend | React, Vite, Leaflet (react-leaflet), Zustand, CSS Modules |
+| Backend | Python, FastAPI, SQLAlchemy, Alembic |
+| База данных | PostgreSQL |
 | Контейнеризация | Docker, Docker Compose |
-| Миграции | Alembic |
 
 ## Требования
 
@@ -97,10 +96,10 @@ TraineeShip_12devs/
 │   ├── src/
 │   │   ├── api/           # API клиент
 │   │   ├── components/    # React компоненты
-│   │   ├── hooks/        # Кастомные хуки
-│   │   ├── pages/        # Страницы
-│   │   ├── store/        # Zustand хранилище
-│   │   └── styles/       # Глобальные стили
+│   │   ├── hooks/         # Кастомные хуки
+│   │   ├── pages/         # Страницы
+│   │   ├── store/         # Zustand хранилище
+│   │   └── styles/        # Глобальные стили
 │   ├── Dockerfile
 │   └── package.json
 │
@@ -113,21 +112,22 @@ TraineeShip_12devs/
 
 ## Конфигурация
 
-### Переменные окружения (Backend)
+### Переменные окружения
 
-Создайте файл `backend/.env`:
-
-```env
-DATABASE_URL=postgresql://postgres:postgres@db:5432/geoquiz
-```
-
-### Переменные окружения (Frontend)
-
-Создайте файл `frontend/.env`:
+Для локальной разработки создайте файл `.env` в корне проекта на основе `.env.example`:
 
 ```env
+# База данных
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/geoquiz
+
+# JWT секрет для админ-панели
+JWT_SECRET_KEY=your-secret-key-here
+
+# API URL для frontend
 VITE_API_URL=http://localhost:8000
 ```
+
+Для запуска через Docker Compose переменные окружения задаются в `docker-compose.yml` и `.env` файле в корне проекта.
 
 ## Админ-панель
 
@@ -141,18 +141,36 @@ VITE_API_URL=http://localhost:8000
 
 ## API Endpoints
 
+### Game API
+
 | Метод | Endpoint | Описание |
 |-------|----------|----------|
 | POST | `/api/game/start` | Начало новой игры |
-| GET | `/api/game/{sessionId}/question` | Получение текущего вопроса |
-| POST | `/api/game/{sessionId}/answer` | Отправка ответа |
-| GET | `/api/game/{sessionId}/next` | Следующий вопрос |
-| POST | `/api/game/{sessionId}/finish` | Завершение игры |
-| GET | `/api/game/{sessionId}/result` | Получение итогов |
-| POST | `/api/leaderboard` | Сохранение результата |
-| GET | `/api/leaderboard` | Получение таблицы рейтинга |
+| GET | `/api/game/{session_id}/question` | Получение текущего вопроса |
+| POST | `/api/game/{session_id}/answer` | Отправка ответа |
+| GET | `/api/game/{session_id}/next` | Следующий вопрос |
+| POST | `/api/game/{session_id}/finish` | Завершение игры |
+| GET | `/api/game/{session_id}/result` | Получение итогов |
 
-Полная документация API доступна по адресу `/docs` после запуска backend.
+### Leaderboard API
+
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| POST | `/api/leaderboard/save` | Сохранение результата |
+| GET | `/api/leaderboard?mode={mode}` | Получение таблицы рейтинга |
+| GET | `/api/leaderboard/with-user?mode={mode}&user_entry_id={id}` | Рейтинг с позицией пользователя |
+
+### Admin API
+
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| POST | `/api/admin/login` | Авторизация администратора |
+| GET | `/api/admin/questions` | Получение всех вопросов |
+| POST | `/api/admin/questions` | Создание нового вопроса |
+| PUT | `/api/admin/questions/{question_id}` | Обновление вопроса |
+| DELETE | `/api/admin/questions/{question_id}` | Удаление вопроса |
+
+Полная документация API доступна по адресу http://localhost:8000/docs после запуска backend.
 
 ## Миграции базы данных
 
