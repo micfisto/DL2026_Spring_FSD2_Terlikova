@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 2rem;
     width: 100%;
     background: #172933;
 }
@@ -18,6 +17,7 @@
 .hero-animation-container {
     height: 4rem;
     position: relative;
+    margin-top: -50px;
 }
 
 .hero-title-container {
@@ -102,7 +102,7 @@ h1.hero-title {
     gap: 0.8rem;
     padding: 1.25rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid transparent;
+    border: 1px solid transparent;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -111,7 +111,7 @@ h1.hero-title {
 
 .mode-card:hover {
     transform: translateY(-3px);
-    background: linear-gradient(135deg, rgb(55,78,88), rgb(43,63,71));
+    background: linear-gradient(135deg, rgb(55, 78, 88), rgb(43, 63, 71));
 }
 
 .mode-card-active {
@@ -167,8 +167,9 @@ h1.hero-title {
     color: #eae0d5;
     cursor: pointer;
     transition: 0.25s;
-    margin: -10px auto 0 auto;
-    width: 400px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 400px;
     background: linear-gradient(135deg, rgb(55, 78, 88), rgb(43, 63, 71));
 }
 
@@ -193,6 +194,21 @@ h1.hero-title {
 
     .hero-icon {
         font-size: 4rem;
+    }
+
+    .mode-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home {
+        padding: 0 1rem;
+    }
+
+    .home-start-button {
+        width: 100%;
+        max-width: none;
+        font-size: 18px;
+        padding: 16px;
     }
 
     .mode-grid {

@@ -1,8 +1,8 @@
 .leaderboard-container {
     max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
     min-height: 500px;
+    margin-top: -60px;
+    padding: 0 1rem;
 }
 
 .leaderboard-title {
@@ -21,7 +21,6 @@
     font-size: 1.2rem;
 }
 
-/* tabs */
 .leaderboard-tabs {
     display: flex;
     justify-content: center;
@@ -59,15 +58,14 @@
     border-radius: 50%;
 }
 
-/* table container */
 .leaderboard-table-container {
     max-height: 400px;
     overflow-y: auto;
+    overflow-x: auto;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.03);
 }
 
-/* scrollbar */
 .leaderboard-table-container::-webkit-scrollbar {
     width: 8px;
 }
@@ -144,8 +142,6 @@
     animation: spin 1s linear infinite;
 }
 
-/* spin animation moved to Button.css */
-
 .leaderboard-loading p {
     margin-top: 1rem;
 }
@@ -174,4 +170,29 @@
 .leaderboard-empty p {
     font-size: 1.125rem;
     margin: 0;
+}
+
+@media (max-width: 600px) {
+    .leaderboard-container {
+        margin-top: 0;
+    }
+
+    .leaderboard-title {
+        font-size: 1.5rem;
+    }
+
+    .leaderboard-mode {
+        font-size: 1rem;
+    }
+
+    .leaderboard-tab {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 0.6rem 0.3rem;
+        font-size: 0.75rem;
+    }
 }

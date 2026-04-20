@@ -25,7 +25,6 @@
     animation: slideUp 0.5s ease;
 }
 
-/* slideUp animation moved to Button.css */
 
 .admin-login-header {
     margin-bottom: 2rem;
@@ -35,7 +34,7 @@
     font-size: 2rem;
     margin: 0 0 0.5rem;
 
-    color: #eae0d5; /* исправлено: без background-clip */
+    color: #eae0d5;
 }
 
 .admin-login-header p {

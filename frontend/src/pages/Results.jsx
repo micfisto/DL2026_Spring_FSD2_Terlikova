@@ -19,14 +19,13 @@ export default function Results() {
     const score = state.finalScore || 0;
     const difficulty = state.difficulty || "easy";
     
-    // Множители для разных уровней сложности
     const difficultyMultipliers = {
-        "easy": 1.0,    // Простой: до 5000 очков
-        "medium": 1.5,  // Средний: до 7500 очков
-        "hard": 2.0     // Сложный: до 10000 очков
+        "easy": 1.0,
+        "medium": 1.5,
+        "hard": 2.0
     };
     
-    const baseMaxScore = 5000; // Базовый максимум для 5 вопросов
+    const baseMaxScore = 5000;
     const maxScore = Math.round(baseMaxScore * (difficultyMultipliers[difficulty] || 1.0));
     const percentage = maxScore ? (score / maxScore) * 100 : 0;
 
@@ -113,7 +112,7 @@ export default function Results() {
                     />
                 </div>
 
-                {saved && leaderboardData && !leaderboardData.user_rank && (
+                {saved && leaderboardData && leaderboardData.user_rank && leaderboardData.user_rank <= 5 && (
                     <div className="top-five-notice">
                         🎉 Вы в топ-5!
                     </div>

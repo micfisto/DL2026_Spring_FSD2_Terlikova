@@ -1,9 +1,9 @@
 .game {
+    margin-top: -40px;
     display: flex;
     flex-direction: column;
-    min-height: 580px;
     width: 100%;
-
+    min-height: 100vh;
     background: #172933;
     color: #eae0d5;
 }
@@ -12,155 +12,83 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    gap: 1.5rem;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 .hud {
-    margin-top: -20px;
-    margin-bottom: -10px;
-    position: sticky;
-    top: 60px;
-    z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0;
-    transition: 0.3s ease;
 
     flex-wrap: wrap;
     gap: 0.5rem;
-}
 
-.hud h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0;
+    padding: 10px;
+    border-radius: 10px;
 
-    background: #eae0d5;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    max-width: 100%;
-    flex: 1;
-    min-width: 200px;
-}
-
-.timer {
-    font-size: 1.1rem;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-}
-
-.timer-warning {
-    color: #ff4d4d;
-}
-
-.score-display {
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: flex;
-    gap: 0.25rem;
-}
-
-.score-max {
-    opacity: 0.7;
-    font-weight: 400;
-}
-
-.error-message {
-    padding: 1rem;
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #ef4444;
-    border-radius: 12px;
-    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .map-container {
-    flex: 1;
-    min-height: 360px;
-    overflow: hidden;
-    transition: 0.3s ease;
-}
+    margin-top: -10px;
+    margin-bottom: -10px;
+    min-height: 300px;
 
-.map-container:hover {
-    box-shadow: 0 0 12px rgba(156, 141, 127, 0.4);
+    position: relative;
+    z-index: 1;
 }
 
 .answer-result {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1rem;
     align-items: center;
-
-    margin-top: -10px;
-    margin-bottom: -10px;
+    margin-bottom: -15px;
     padding: 0.5rem;
-
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
 }
 
-.answer-result p {
-    margin: 0;
-}
-
 .controls {
     display: flex;
-    gap: 1.5rem;
-    padding: 1rem;
     justify-content: center;
+    padding: 1rem;
 }
 
 .controls button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 10px 14px;
+    margin-top: -10px;
+    width: 100%;
+    max-width: 400px;
+
+    padding: 14px;
     font-size: 18px;
-    font-weight: 400;
     border-radius: 10px;
+
     border: none;
     color: #eae0d5;
+
     cursor: pointer;
     transition: 0.25s;
-    margin: -20px auto 0 auto;
-    width: 400px;
-    background: linear-gradient(135deg, rgb(55, 78, 88), rgb(43, 63, 71));
 
+    background: linear-gradient(135deg, rgb(55, 78, 88), rgb(43, 63, 71));
 }
 
 .controls button:hover {
-    transform: translateY(-3px);
-}
-
-.controls button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.game-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-    font-size: 1.25rem;
-    color: rgba(234, 224, 213, 0.7);
+    transform: translateY(-2px);
 }
 
 @media (max-width: 600px) {
-    .game {
-        padding: 1rem;
-    }
 
     .hud {
         flex-direction: column;
-        gap: 0.5rem;
         text-align: center;
+        padding: 8px;
+    }
+
+    .game-layout {
+        margin-top: 100px;
+        gap: 1rem;
     }
 
     .map-container {
@@ -172,6 +100,6 @@
     }
 
     .controls button {
-        width: 100%;
+        max-width: none;
     }
 }

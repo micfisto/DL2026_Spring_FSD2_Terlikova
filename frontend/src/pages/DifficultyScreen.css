@@ -1,9 +1,9 @@
 .difficulty-screen {
+    margin-top: -90px;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: auto;
-    padding: 4rem 2rem;
     width: 100%;
     box-sizing: border-box;
     color: #eae0d5;
@@ -113,11 +113,13 @@
 
 .difficulty-screen-start-button {
     margin-top: 28px;
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 
     padding: 20px 24px;
     font-size: 22px;
-    font-weight: 600;
 
     border-radius: 20px;
     border: none;
@@ -151,4 +153,32 @@
     font-size: 21px;
 }
 
-/* spin animation moved to Button.css */
+@media (max-width: 600px) {
+    .difficulty-screen {
+        margin-top: 0;
+        padding: 0 1rem;
+    }
+
+    .difficulty-grid {
+        grid-template-columns: 1fr; /* одна колонка */
+        gap: 12px;
+    }
+
+    .difficulty-card {
+        padding: 18px 10px;
+    }
+
+    .difficulty-label {
+        font-size: 20px;
+    }
+
+    .difficulty-desc {
+        font-size: 14px;
+        max-width: none;
+    }
+
+    .difficulty-screen-start-button {
+        font-size: 18px;
+        padding: 16px;
+    }
+}

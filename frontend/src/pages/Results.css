@@ -18,15 +18,11 @@
     animation: slideUp 0.5s ease;
 }
 
-/* slideUp animation moved to Button.css */
-
 .results-emoji {
     font-size: 3rem;
     margin-bottom: 1rem;
     animation: bounce 1s ease infinite;
 }
-
-/* bounce animation moved to Button.css */
 
 .results-title {
     font-size: 2.5rem;
@@ -151,7 +147,6 @@
     animation: fadeIn 0.5s ease;
 }
 
-/* fadeIn animation moved to Button.css */
 
 .results-error {
     background: rgba(239, 68, 68, 0.15);

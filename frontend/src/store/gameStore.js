@@ -77,7 +77,6 @@ export const useGameStore = create((set, get) => ({
 
         const qid = question?.id ?? question?.question_id;
 
-        // 🔥 ЖЁСТКАЯ ЗАЩИТА ОТ 400
         if (!qid || qid !== currentQuestionId) {
             console.warn("DROP ANSWER:", { qid, currentQuestionId });
             return;
@@ -85,7 +84,6 @@ export const useGameStore = create((set, get) => ({
 
         set({ loading: true, error: null });
 
-        // Если точка не выбрана (таймер истёк), используем координаты по умолчанию (0, 0)
         const lat = selectedPoint?.lat ?? 0;
         const lng = selectedPoint?.lng ?? 0;
 

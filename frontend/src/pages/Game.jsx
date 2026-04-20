@@ -33,7 +33,6 @@ export default function Game() {
 
   const timeForDifficulty = getTimeForDifficulty(difficulty);
 
-  // Множители для разных уровней сложности
   const difficultyMultipliers = {
       "easy": 1.0,
       "medium": 1.5,
@@ -129,22 +128,22 @@ export default function Game() {
         )}
 
         <div className="controls">
-          <button
-            disabled={!selectedPoint || loading || result}
-            onClick={() => {
-              if (lockRef.current) return;
-              lockRef.current = true;
+          {!result ? (
+            <button
+              disabled={!selectedPoint || loading}
+              onClick={() => {
+                if (lockRef.current) return;
+                lockRef.current = true;
 
-              timer.stop();
-              answer().finally(() => {
-                lockRef.current = false;
-              });
-            }}
-          >
-            {loading ? "Отправка..." : "Ответить"}
-          </button>
-
-          {result && (
+                timer.stop();
+                answer().finally(() => {
+                  lockRef.current = false;
+                });
+              }}
+            >
+              {loading ? "Отправка..." : "Ответить"}
+            </button>
+          ) : (
             <button
               onClick={handleNext}
               disabled={loading}
