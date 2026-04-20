@@ -1,15 +1,15 @@
 .admin-login {
-    min-height: 100vh;
+    height: 450px;
+    margin-top: -20px;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    padding: 2rem;
+    padding: 5rem;
     background: #172933;
 }
 
 .admin-login-container {
-    margin-top: -15px;
 
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);

@@ -28,6 +28,17 @@
     margin: 0;
 }
 
+.footer-copy a {
+    color: #7e8f91;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    transition: color 0.2s;
+}
+
+.footer-copy a:hover {
+    color: #eae0d5;
+}
+
 @media (max-width: 600px) {
     .footer-content {
         flex-direction: column;
