@@ -117,7 +117,6 @@ def generate_landmarks():
 
 
 def generate_test_questions():
-    """Generate test questions for UI edge cases."""
     return [
         {
             "question_text": "В какой стране находится очень длинное и специально перегруженное название достопримечательности, которое должно проверить, как интерфейс справляется с переполнением текста и переносами строк в карточке?",
@@ -195,14 +194,7 @@ def generate_all_questions():
 
 
 def seed_questions(db: Session, force_recreate: bool = False):
-    """
-    Seed questions with upsert logic.
-    
-    Args:
-        db: Database session
-        force_recreate: If True, deletes all existing questions before seeding.
-                     If False (default), updates existing and adds new ones.
-    """
+
     questions = generate_all_questions()
 
     if force_recreate:
@@ -236,18 +228,11 @@ def seed_questions(db: Session, force_recreate: bool = False):
                 existing_q.is_active = q["is_active"]
                 updated_texts.add(key)
             else:
-                # Add new question
                 db.add(Question(**q))
-        
-        # Optionally deactivate questions that are not in the seed data anymore
-        # (commented out to preserve custom questions)
-        # for key, q in existing_map.items():
-        #     if key not in updated_texts:
-        #         q.is_active = False
+
         
         print(f"Updated {len(updated_texts)} existing questions")
 
-    # Add any new questions that weren't in the existing set
     if not force_recreate:
         existing_texts = db.query(Question).all()
         existing_keys = {(q.question_text, q.mode) for q in existing_texts}
@@ -262,7 +247,6 @@ def seed_questions(db: Session, force_recreate: bool = False):
 
     db.commit()
 
-    # Get final count
     total = db.query(Question).count()
     active = db.query(Question).filter_by(is_active=True).count()
     print(f"Total questions in DB: {total} (active: {active})")
