@@ -185,6 +185,21 @@ alembic upgrade head
 alembic downgrade -1
 ```
 
+## 🌐 Deployment
+
+| Платформа         | URL                                               | Описание         |
+| ----------------- | ------------------------------------------------- | ---------------- |
+| Frontend (Vercel) | https://dl-2026-spring-fsd-2-terlikova.vercel.app | React приложение |
+| Backend (Render)  | https://dl2026-spring-fsd2-terlikova.onrender.com | FastAPI сервер   |
+
+### Настройка переменных окружения для продакшена
+
+Для корректной работы фронтенд должен знать URL бэкенда:
+
+```env
+VITE_API_URL=https://your-backend.onrender.com
+```
+
 ## Лицензия
 
 MIT License
