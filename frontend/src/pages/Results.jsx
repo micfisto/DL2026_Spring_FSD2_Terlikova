@@ -17,7 +17,17 @@ export default function Results() {
     const [entryId, setEntryId] = useState(null);
 
     const score = state.finalScore || 0;
-    const maxScore = 5000;
+    const difficulty = state.difficulty || "easy";
+    
+    // Множители для разных уровней сложности
+    const difficultyMultipliers = {
+        "easy": 1.0,    // Простой: до 5000 очков
+        "medium": 1.5,  // Средний: до 7500 очков
+        "hard": 2.0     // Сложный: до 10000 очков
+    };
+    
+    const baseMaxScore = 5000; // Базовый максимум для 5 вопросов
+    const maxScore = Math.round(baseMaxScore * (difficultyMultipliers[difficulty] || 1.0));
     const percentage = maxScore ? (score / maxScore) * 100 : 0;
 
     useEffect(() => {

@@ -22,7 +22,7 @@ from ..schemas.game import (
 )
 
 from ..utils.math.distance import calculate_distance_km
-from ..utils.math.scoring import calculate_points
+from ..utils.math.scoring import calculate_points, get_max_points_for_difficulty
 from ..utils.geo.country import point_in_country
 
 
@@ -154,7 +154,7 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
         )
 
         if ok:
-            points = 1000
+            points = get_max_points_for_difficulty(session.difficulty)
             distance = 0
         else:
             distance = calculate_distance_km(
@@ -163,7 +163,7 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
                 q.correct_lat,
                 q.correct_lng
             )
-            points = calculate_points(distance)
+            points = calculate_points(distance, session.difficulty)
 
     else:
         distance = calculate_distance_km(
@@ -172,7 +172,7 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
             q.correct_lat,
             q.correct_lng
         )
-        points = calculate_points(distance)
+        points = calculate_points(distance, session.difficulty)
 
     db.add(Answer(
         session_id=session.id,

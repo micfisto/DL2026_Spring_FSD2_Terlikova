@@ -73,7 +73,7 @@ export const useGameStore = create((set, get) => ({
         } = state;
 
         if (loading || result) return;
-        if (!sessionId || !selectedPoint || !question) return;
+        if (!sessionId || !question) return;
 
         const qid = question?.id ?? question?.question_id;
 
@@ -85,11 +85,15 @@ export const useGameStore = create((set, get) => ({
 
         set({ loading: true, error: null });
 
+        // Если точка не выбрана (таймер истёк), используем координаты по умолчанию (0, 0)
+        const lat = selectedPoint?.lat ?? 0;
+        const lng = selectedPoint?.lng ?? 0;
+
         try {
             const res = await gameAPI.sendAnswer(sessionId, {
                 question_id: qid,
-                selected_lat: selectedPoint.lat,
-                selected_lng: selectedPoint.lng,
+                selected_lat: lat,
+                selected_lng: lng,
             });
 
             set({

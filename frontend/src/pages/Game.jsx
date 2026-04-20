@@ -33,19 +33,27 @@ export default function Game() {
 
   const timeForDifficulty = getTimeForDifficulty(difficulty);
 
+  // Множители для разных уровней сложности
+  const difficultyMultipliers = {
+      "easy": 1.0,
+      "medium": 1.5,
+      "hard": 2.0
+  };
+  const baseMaxScore = 5000;
+  const maxScore = Math.round(baseMaxScore * (difficultyMultipliers[difficulty] || 1.0));
+
   const questionId = question?.question_id ?? question?.id;
 
   const handleTimeUp = useCallback(() => {
     if (lockRef.current) return;
     if (!questionId || result) return;
-    if (!selectedPoint) return;
 
     lockRef.current = true;
 
     answer().finally(() => {
       lockRef.current = false;
     });
-  }, [questionId, result, selectedPoint, answer]);
+  }, [questionId, result, answer]);
 
   const timer = useTimer(timeForDifficulty, handleTimeUp);
 
@@ -56,6 +64,7 @@ export default function Game() {
         state: {
           sessionId,
           finalScore: score,
+          difficulty: difficulty,
         },
       });
     }
@@ -90,7 +99,10 @@ export default function Game() {
       <div className="game-layout">
         <div className="hud">
           <h2>{question?.text}</h2>
-          <div>Score: {score}</div>
+          <div className="score-display">
+            <span>Score: {score}</span>
+            <span className="score-max">/ {maxScore}</span>
+          </div>
 
           <div className={`timer ${timer.timeLeft <= 11 ? "timer-warning" : ""}`}>
             Time: {timer.timeLeft}s
