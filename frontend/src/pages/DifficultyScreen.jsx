@@ -12,6 +12,11 @@ export default function DifficultyScreen() {
     const navigate = useNavigate();
     const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
 
+    if (!mode) {
+        navigate("/");
+        return null;
+    }
+
     const handleStart = async () => {
         try {
             useGameStore.setState({ error: null });
