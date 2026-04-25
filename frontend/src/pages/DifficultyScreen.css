@@ -160,7 +160,7 @@
     }
 
     .difficulty-grid {
-        grid-template-columns: 1fr; /* одна колонка */
+        grid-template-columns: 1fr;
         gap: 12px;
     }
 

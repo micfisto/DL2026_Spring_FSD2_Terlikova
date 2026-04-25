@@ -70,6 +70,12 @@ export default function Game() {
   };
 
   useEffect(() => {
+    if (!mode || !difficulty) {
+      navigate("/", { state: { notification: "Не выбран режим или сложность" } });
+    }
+  }, [mode, difficulty, navigate]);
+
+  useEffect(() => {
     if (!question || result || loading) {
       timer.stop();
       return;

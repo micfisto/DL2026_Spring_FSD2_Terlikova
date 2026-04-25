@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameStore } from "../store/gameStore";
 import "./DifficultyScreen.css";
@@ -12,12 +12,22 @@ export default function DifficultyScreen() {
     const navigate = useNavigate();
     const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
 
-    if (!mode) {
-        navigate("/");
-        return null;
-    }
+    useEffect(() => {
+        if (!mode) {
+            navigate("/", {
+                state: { notification: "Сначала выберите режим" }
+            });
+        }
+    }, [mode, navigate]);
 
     const handleStart = async () => {
+        if (!mode || !selectedDifficulty) {
+            navigate("/", {
+                state: { notification: "Выберите режим и сложность" }
+            });
+            return;
+        }
+
         try {
             useGameStore.setState({ error: null });
 
@@ -42,30 +52,9 @@ export default function DifficultyScreen() {
     };
 
     const difficulties = [
-        { 
-            value: "easy", 
-            label: "Легкий", 
-            icon: "🔥",
-            desc: "Больше времени, крупные регионы",
-            time: "60 сек",
-            score: "x1"
-        },
-        { 
-            value: "medium", 
-            label: "Средний", 
-            icon: "🔥🔥",
-            desc: "Баланс времени и сложности",
-            time: "30 сек",
-            score: "x1.5"
-        },
-        { 
-            value: "hard", 
-            label: "Сложный", 
-            icon: "🔥🔥🔥",
-            desc: "Мало времени, все регионы",
-            time: "15 сек",
-            score: "x2"
-        },
+        { value: "easy", label: "Легкий", icon: "🔥", desc: "Больше времени, крупные регионы", time: "60 сек", score: "x1" },
+        { value: "medium", label: "Средний", icon: "🔥🔥", desc: "Баланс времени и сложности", time: "30 сек", score: "x1.5" },
+        { value: "hard", label: "Сложный", icon: "🔥🔥🔥", desc: "Мало времени, все регионы", time: "15 сек", score: "x2" },
     ];
 
     const getModeLabel = () => {

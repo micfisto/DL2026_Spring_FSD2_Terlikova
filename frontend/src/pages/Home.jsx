@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useGameStore } from "../store/gameStore";
 import "./Home.css";
 
@@ -8,6 +8,10 @@ export default function Home() {
     const error = useGameStore((s) => s.error);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const notification = location.state?.notification;
+
     const [selectedMode, setSelectedMode] = useState("capitals");
 
     const handleContinue = () => {
@@ -38,6 +42,13 @@ export default function Home() {
             </div>
 
             <div className="home-content">
+
+                {notification && (
+                    <div className="home-error-message">
+                        {notification}
+                    </div>
+                )}
+
                 <div className="mode-select">
                     <h2 className="mode-title">Выбери режим</h2>
                     <div className="mode-grid">
