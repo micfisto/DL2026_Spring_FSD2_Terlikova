@@ -1,35 +1,29 @@
 import { Marker } from "react-leaflet";
-import {
-    defaultIcon,
-    orangeIcon,
-    redIcon,
-    goldIcon,
-} from "../icons";
+import { orangeIcon, redIcon, goldIcon } from "../icons";
 
 export default function MarkersLayer({
     selected,
+    correctPoint,
     showResult,
-    mode,
-    isCorrect,
 }) {
     if (!selected) return null;
 
-    const getIcon = () => {
-        if (!showResult) {
-            return orangeIcon;
-        }
-        
-        if (mode === "countries") {
-            return isCorrect ? goldIcon : redIcon;
-        }
-        
-        return defaultIcon;
-    };
+    const isCorrect =
+        showResult &&
+        correctPoint &&
+        Math.abs(selected.lat - correctPoint.lat) < 0.0001 &&
+        Math.abs(selected.lng - correctPoint.lng) < 0.0001;
 
     return (
-        <Marker
-            position={selected}
-            icon={getIcon()}
-        />
+        <>
+            <Marker
+                position={selected}
+                icon={showResult ? (isCorrect ? goldIcon : redIcon) : orangeIcon}
+            />
+
+            {showResult && correctPoint && (
+                <Marker position={correctPoint} icon={goldIcon} />
+            )}
+        </>
     );
 }

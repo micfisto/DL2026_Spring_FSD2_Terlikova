@@ -43,7 +43,6 @@ export function useTimer(initialTime = 30, onTimeUp) {
                     setIsActive(false);
                     setIsFinished(true);
 
-                    // ✔ безопасный вызов callback
                     if (callbackRef.current) {
                         callbackRef.current();
                     }
