@@ -20,9 +20,9 @@ const MODES = [
 ];
 
 const DIFFICULTIES = [
-    { value: "easy", label: "Легко", color: "#22c55e" },
-    { value: "medium", label: "Средне", color: "#f59e0b" },
-    { value: "hard", label: "Сложно", color: "#ef4444" }
+    { value: "easy", label: "Легко" },
+    { value: "medium", label: "Средне" },
+    { value: "hard", label: "Сложно" }
 ];
 
 const MODE_LABELS = {
@@ -35,8 +35,10 @@ const emptyForm = {
     question_text: "",
     mode: "capitals",
     target_name: "",
+    target_type: "capital",
     correct_lat: "",
     correct_lng: "",
+    country_code: "",
     difficulty: "easy",
     is_active: true,
 };
@@ -57,9 +59,10 @@ export default function AdminDashboard() {
     const [filterMode, setFilterMode] = useState("all");
     const [filterActive, setFilterActive] = useState("all");
 
+    const [deleteTarget, setDeleteTarget] = useState(null);
+
     const formRef = useRef(null);
 
-    // ✅ ВСЕ ХУКИ СНАЧАЛА
     useEffect(() => {
         fetchQuestions();
     }, [token]);
@@ -78,28 +81,24 @@ export default function AdminDashboard() {
         }
     }
 
-    const scrollToForm = () => {
-        setTimeout(() => {
-            formRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-        }, 80);
-    };
-
     const handleEdit = (q) => {
         setForm({
             question_text: q.question_text,
             mode: q.mode,
             target_name: q.target_name,
-            correct_lat: String(q.correct_lat),
-            correct_lng: String(q.correct_lng),
+            target_type: q.target_type,
+            correct_lat: String(q.correct_lat ?? ""),
+            correct_lng: String(q.correct_lng ?? ""),
+            country_code: q.country_code ?? "",
             difficulty: q.difficulty,
             is_active: q.is_active,
         });
 
         setEditingId(q.id);
-        scrollToForm();
+
+        setTimeout(() => {
+            formRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 80);
     };
 
     const resetForm = () => {
@@ -111,35 +110,46 @@ export default function AdminDashboard() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
 
         const payload = {
             ...form,
-            target_type:
-                form.mode === "capitals"
-                    ? "capital"
-                    : form.mode === "countries"
-                    ? "country"
-                    : "landmark",
-            correct_lat: parseFloat(form.correct_lat),
-            correct_lng: parseFloat(form.correct_lng),
+            correct_lat: Number(form.correct_lat),
+            correct_lng: Number(form.correct_lng),
+            country_code: form.country_code?.trim() || null,
         };
 
-        if (editingId) {
-            await updateQuestion(token, editingId, payload);
-            setSuccess("Вопрос обновлён");
-        } else {
-            await createQuestion(token, payload);
-            setSuccess("Вопрос создан");
-        }
+        try {
+            if (editingId) {
+                await updateQuestion(token, editingId, payload);
+                setSuccess("Вопрос обновлён");
+            } else {
+                await createQuestion(token, payload);
+                setSuccess("Вопрос создан");
+            }
 
-        resetForm();
+            resetForm();
+            fetchQuestions();
+
+        } catch (err) {
+            setError(err?.response?.data?.detail || "Ошибка при сохранении вопроса");
+        }
+    };
+
+    const handleDeleteClick = (q) => {
+        setDeleteTarget(q);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteTarget) return;
+
+        await deleteQuestion(token, deleteTarget.id);
+        setDeleteTarget(null);
         fetchQuestions();
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm("Удалить вопрос?")) return;
-        await deleteQuestion(token, id);
-        fetchQuestions();
+    const cancelDelete = () => {
+        setDeleteTarget(null);
     };
 
     const handleToggleVisibility = async (q) => {
@@ -164,20 +174,9 @@ export default function AdminDashboard() {
 
             <div className="admin-content">
 
-                {/* FORM */}
                 <div className="admin-form-section" ref={formRef}>
 
-                    <div className="form-header">
-                        <h2>
-                            {editingId ? "Редактирование" : "Создание"}
-                        </h2>
-
-                        {editingId && (
-                            <Button small onClick={resetForm}>
-                                Отмена
-                            </Button>
-                        )}
-                    </div>
+                    <h2>{editingId ? "Редактирование" : "Создание"}</h2>
 
                     <form onSubmit={handleSubmit} className="question-form">
 
@@ -187,14 +186,22 @@ export default function AdminDashboard() {
                                 setForm({ ...form, question_text: e.target.value })
                             }
                             placeholder="Текст вопроса"
-                            maxLength={200}
                         />
 
                         <div className="form-row">
                             <select
                                 value={form.mode}
                                 onChange={(e) =>
-                                    setForm({ ...form, mode: e.target.value })
+                                    setForm({
+                                        ...form,
+                                        mode: e.target.value,
+                                        target_type:
+                                            e.target.value === "capitals"
+                                                ? "capital"
+                                                : e.target.value === "countries"
+                                                    ? "country"
+                                                    : "landmark",
+                                    })
                                 }
                             >
                                 {MODES.map(m => (
@@ -223,8 +230,19 @@ export default function AdminDashboard() {
                             onChange={(e) =>
                                 setForm({ ...form, target_name: e.target.value })
                             }
-                            placeholder="Название страны"
-                            maxLength={100}
+                            placeholder="Название"
+                        />
+
+                        <Input
+                            value={form.country_code}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    country_code: e.target.value.toUpperCase()
+                                })
+                            }
+                            placeholder="Country code (FRA)"
+                            maxLength={3}
                         />
 
                         <div className="form-row">
@@ -235,7 +253,6 @@ export default function AdminDashboard() {
                                     setForm({ ...form, correct_lat: e.target.value })
                                 }
                                 placeholder="lat"
-                                maxLength={15}
                             />
                             <Input
                                 type="number"
@@ -244,7 +261,6 @@ export default function AdminDashboard() {
                                     setForm({ ...form, correct_lng: e.target.value })
                                 }
                                 placeholder="lng"
-                                maxLength={15}
                             />
                         </div>
 
@@ -257,78 +273,93 @@ export default function AdminDashboard() {
                     </form>
                 </div>
 
-                {/* LIST */}
                 <div className="admin-questions-section">
 
                     <h2>Вопросы</h2>
 
                     <div className="questions-filter">
-                        <select
-                            value={filterDifficulty}
-                            onChange={(e) => setFilterDifficulty(e.target.value)}
-                        >
+                        <select value={filterDifficulty} onChange={(e) => setFilterDifficulty(e.target.value)}>
                             <option value="all">Все сложности</option>
                             {DIFFICULTIES.map(d => (
                                 <option key={d.value} value={d.value}>{d.label}</option>
                             ))}
                         </select>
 
-                        <select
-                            value={filterMode}
-                            onChange={(e) => setFilterMode(e.target.value)}
-                        >
-                            <option value="all">Все категории</option>
+                        <select value={filterMode} onChange={(e) => setFilterMode(e.target.value)}>
+                            <option value="all">Все режимы</option>
                             {MODES.map(m => (
                                 <option key={m.value} value={m.value}>{m.label}</option>
                             ))}
                         </select>
 
-                        <select
-                            value={filterActive}
-                            onChange={(e) => setFilterActive(e.target.value)}
-                        >
-                            <option value="all">Все статусы</option>
+                        <select value={filterActive} onChange={(e) => setFilterActive(e.target.value)}>
+                            <option value="all">Все</option>
                             <option value="active">Активные</option>
                             <option value="inactive">Неактивные</option>
                         </select>
                     </div>
 
                     {loading ? (
-                        <div>Загрузка...</div>
+                        <div className="loading">Загрузка...</div>
                     ) : (
                         <div className="questions-grid">
                             {filteredQuestions.map(q => (
-                                <div
-                                    key={q.id}
-                                    className={`question-card ${
-                                        q.id === editingId ? "editing" : ""
-                                    } ${!q.is_active ? "inactive" : ""}`}
-                                >
+                                <div key={q.id} className="question-card">
+
                                     <div className="question-header">
+                                        <span>{MODE_LABELS[q.mode]}</span>
                                         <span className={`question-difficulty ${q.difficulty}`}>
-                                            {q.difficulty === 'easy' ? 'Легко' : q.difficulty === 'medium' ? 'Средне' : 'Сложно'}
+                                            {DIFFICULTIES.find(d => d.value === q.difficulty)?.label}
                                         </span>
-                                        <span className="question-mode">{MODE_LABELS[q.mode]}</span>
                                     </div>
 
                                     <p>{q.question_text}</p>
 
+                                    <small>{q.target_name}</small>
+                                    <small>{q.country_code ?? "—"}</small>
+                                    <small>{q.correct_lat}, {q.correct_lng}</small>
+
                                     <div className="question-actions">
                                         <Button small onClick={() => handleEdit(q)}>Ред.</Button>
                                         <Button small onClick={() => handleToggleVisibility(q)}>
-                                            {q.is_active ? "Скрыть" : "Показать"}
+                                            {q.is_active ? "Hide" : "Show"}
                                         </Button>
-                                        <Button small variant="danger" onClick={() => handleDelete(q.id)}>
-                                            Удалить
+                                        <Button small onClick={() => handleDeleteClick(q)}>
+                                            Del
                                         </Button>
                                     </div>
+
                                 </div>
                             ))}
                         </div>
                     )}
-
                 </div>
             </div>
+
+            {deleteTarget && (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+
+                        <h3>Удалить вопрос?</h3>
+
+                        <p className="modal-text">
+                            {deleteTarget.question_text}
+                        </p>
+
+                        <div className="modal-actions">
+                            <button className="danger-btn" onClick={confirmDelete}>
+                                Удалить
+                            </button>
+
+                            <button className="cancel-btn" onClick={cancelDelete}>
+                                Отмена
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
