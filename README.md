@@ -95,11 +95,12 @@ TraineeShip_12devs/
 ├── frontend/               # React приложение
 │   ├── src/
 │   │   ├── api/           # API клиент
-│   │   ├── components/    # React компоненты
+│   │   ├── components/    # React компоненты (с встроенными CSS)
 │   │   ├── hooks/         # Кастомные хуки
-│   │   ├── pages/         # Страницы
+│   │   ├── pages/         # Страницы (с встроенными CSS)
 │   │   ├── store/         # Zustand хранилище
-│   │   └── styles/        # Глобальные стили
+│   │   ├── styles/        # Глобальные стили
+│   │   └── utils/         # Утилиты
 │   ├── Dockerfile
 │   └── package.json
 │
@@ -107,6 +108,7 @@ TraineeShip_12devs/
 │   └── design.md          # Технический дизайн
 │
 ├── docker-compose.yml      # Конфигурация Docker Compose
+├── .env.example            # Пример переменных окружения
 └── README.md              # Этот файл
 ```
 
@@ -114,30 +116,32 @@ TraineeShip_12devs/
 
 ### Переменные окружения
 
-Для локальной разработки создайте файл `.env` в корне проекта на основе `.env.example`:
+Для локальной разработки и Docker-запуска используйте файл `.env` в корне проекта на основе `.env.example`:
 
 ```env
 # База данных
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/geoquiz
 
-# JWT секрет для админ-панели
+# JWT секрет для админ-панели (используйте надёжный случайный ключ)
 JWT_SECRET_KEY=your-secret-key-here
 
 # API URL для frontend
 VITE_API_URL=http://localhost:8000
 ```
 
-Для запуска через Docker Compose переменные окружения задаются в `docker-compose.yml` и `.env` файле в корне проекта.
+Для запуска через Docker Compose переменные окружения задаются в корневом `.env` файле.
 
-## Админ-панель
+### Создание админ-аккаунта
 
-Для доступа к админ-панели используйте учётные данные:
+Админ-аккаунт создаётся через seed-скрипт:
 
-- **URL:** `/admin`
-- **Логин:** `admin`
-- **Пароль:** `admin123`
+```bash
+python backend/app/scripts/seed_admin.py
+```
 
-> **Внимание:** Рекомендуется изменить пароль в продакшене.
+По умолчанию создаётся админ с email `admin@example.com` и паролем `admin123`.
+
+> **Внимание:** В продакшене обязательно измените пароль админ-аккаунта и используйте надёжный `JWT_SECRET_KEY`.
 
 ## API Endpoints
 

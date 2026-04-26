@@ -5,7 +5,6 @@ from ..models.game_session import GameSession
 
 from ..schemas.leaderboard import (
     SaveLeaderboardResponse,
-    LeaderboardResponse,
     LeaderboardWithUserResponse
 )
 
@@ -13,7 +12,6 @@ from ..utils.leaderboard.rank import calculate_rank
 from ..utils.leaderboard.mapper import to_leaderboard_item
 
 
-# ---------------- SAVE ----------------
 
 def save_leaderboard(db: Session, session_id: int, player_name: str):
 
