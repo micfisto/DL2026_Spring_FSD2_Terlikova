@@ -1,8 +1,8 @@
-import { useEffect, useCallback, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useCallback, useMemo, useRef} from "react";
+import {useNavigate} from "react-router-dom";
 import MapView from "../components/map/MapView";
-import { useGameStore } from "../store/gameStore";
-import { useTimer } from "../hooks/useTimer";
+import {useGameStore} from "../store/gameStore";
+import {useTimer} from "../hooks/useTimer";
 import "./Game.css";
 
 export default function Game() {
@@ -108,7 +108,7 @@ export default function Game() {
 
         if (typeof lat !== "number" || typeof lng !== "number") return null;
 
-        return { lat, lng };
+        return {lat, lng};
     }, [result]);
 
     if (!question && !result) {
@@ -142,7 +142,7 @@ export default function Game() {
                         correctPoint={correctPoint}
                         showResult={!!result}
                         mode={mode}
-                        targetCode={question?.correct_country_code}
+                        targetCode={question?.country_code}
                         selectedPoint={selectedPoint}
                     />
                 </div>
@@ -180,5 +180,6 @@ export default function Game() {
                 </div>
             </div>
         </div>
-    );
+    )
+        ;
 }
