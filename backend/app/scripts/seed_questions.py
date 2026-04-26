@@ -1,266 +1,185 @@
-from backend.app.models.question import Question
-from sqlalchemy import text
+import sys
+import os
 from sqlalchemy.orm import Session
 
-CAPITALS = {
-    "easy": {
-        "Франция": ("Париж", 48.8566, 2.3522),
-        "Германия": ("Берлин", 52.52, 13.405),
-        "Италия": ("Рим", 41.9028, 12.4964),
-        "Япония": ("Токио", 35.6762, 139.6503),
-        "США": ("Вашингтон", 38.9072, -77.0369),
-        "Великобритания": ("Лондон", 51.5072, -0.1276),
-        "Испания": ("Мадрид", 40.4168, -3.7038),
-        "Канада": ("Оттава", 45.4215, -75.6972),
-        "Бразилия": ("Бразилиа", -15.8267, -47.9218),
-        "Австралия": ("Канберра", -35.2809, 149.13),
-    },
-    "medium": {
-        "Норвегия": ("Осло", 59.9139, 10.7522),
-        "Польша": ("Варшава", 52.2297, 21.0122),
-        "Таиланд": ("Бангкок", 13.7563, 100.5018),
-        "Турция": ("Анкара", 39.9334, 32.8597),
-        "Аргентина": ("Буэнос-Айрес", -34.6037, -58.3816),
-        "ЮАР": ("Претория", -25.7479, 28.2293),
-        "Египет": ("Каир", 30.0444, 31.2357),
-    },
-    "hard": {
-        "Исландия": ("Рейкьявик", 64.1466, -21.9426),
-        "Словакия": ("Братислава", 48.1486, 17.1077),
-        "Микронезия": ("Паликир", 6.9248, 158.1610),
-        "Бутан": ("Тхимпху", 27.4728, 89.6390),
-        "Мальта": ("Валлетта", 35.8989, 14.5146),
-        "Люксембург": ("Люксембург", 49.6116, 6.1319),
-        "Словения": ("Любляна", 46.0569, 14.5058),
+from app.db import SessionLocal
+from app.models.question import Question
+from app.models.answer import Answer
+from app.models.session_question import SessionQuestion
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, BASE_DIR)
+
+
+
+def make(q, ttype, name, code, lat, lng, mode, diff):
+    return {
+        "question_text": q,
+        "target_type": ttype,
+        "target_name": name,
+        "country_code": code,
+        "correct_lat": lat,
+        "correct_lng": lng,
+        "mode": mode,
+        "difficulty": diff,
+        "is_active": True
     }
-}
-
-LANDMARKS = {
-    "easy": [
-        ("Эйфелева башня", "Франция", 48.8584, 2.2945),
-        ("Статуя Свободы", "США", 40.6892, -74.0445),
-        ("Колизей", "Италия", 41.8902, 12.4922),
-        ("Биг-Бен", "Великобритания", 51.5007, -0.1246),
-        ("Тадж-Махал", "Индия", 27.1751, 78.0421),
-    ],
-    "medium": [
-        ("Ангкор-Ват", "Камбоджа", 13.4125, 103.8670),
-        ("Петра", "Иордания", 30.3285, 35.4444),
-        ("Мачу-Пикчу", "Перу", -13.1631, -72.5450),
-        ("Саграда Фамилия", "Испания", 41.4036, 2.1744),
-        ("Сиднейский оперный театр", "Австралия", -33.8568, 151.2153),
-    ],
-    "hard": [
-        ("Монастырь Такцанг", "Бутан", 27.4881, 89.2708),
-        ("Томбукту", "Мали", 16.8661, -3.0026),
-        ("Остров Пасхи (моаи)", "Чили", -27.1127, -109.3497),
-        ("Кейптаун Столовая гора", "ЮАР", -33.9628, 18.4098),
-    ]
-}
 
 
-def generate_capitals():
+def seed(db: Session, force=False):
+    if force:
+        db.query(SessionQuestion).delete()
+        db.query(Answer).delete()
+        db.query(Question).delete()
+        db.commit()
+        print("DB CLEARED")
+
     questions = []
 
-    for difficulty, data in CAPITALS.items():
-        for country, (capital, lat, lng) in data.items():
-            questions.append({
-                "question_text": f"{capital} — столица какой страны?",
-                "target_type": "capital",
-                "target_name": country,
-                "correct_lat": lat,
-                "correct_lng": lng,
-                "mode": "capitals",
-                "difficulty": difficulty,
-                "is_active": True
-            })
+    # ===================== DATA =====================
 
-    return questions
+    capitals = {
+        "easy": [
+            ("Франция", "Париж", "FRA", 48.8566, 2.3522),
+            ("Германия", "Берлин", "DEU", 52.52, 13.405),
+            ("Италия", "Рим", "ITA", 41.9028, 12.4964),
+            ("Япония", "Токио", "JPN", 35.6762, 139.6503),
+            ("Испания", "Мадрид", "ESP", 40.4168, -3.7038),
+            ("Канада", "Оттава", "CAN", 45.4215, -75.6972),
+            ("Бразилия", "Бразилиа", "BRA", -15.8267, -47.9218),
+            ("Египет", "Каир", "EGY", 30.0444, 31.2357),
+            ("Индия", "Нью-Дели", "IND", 28.6139, 77.209),
+            ("Австралия", "Канберра", "AUS", -35.2809, 149.13),
+        ],
+        "medium": [
+            ("Турция", "Анкара", "TUR", 39.9334, 32.8597),
+            ("Польша", "Варшава", "POL", 52.2297, 21.0122),
+            ("Норвегия", "Осло", "NOR", 59.9139, 10.7522),
+            ("Швеция", "Стокгольм", "SWE", 59.3293, 18.0686),
+            ("Финляндия", "Хельсинки", "FIN", 60.1699, 24.9384),
+            ("Греция", "Афины", "GRC", 37.9838, 23.7275),
+            ("Португалия", "Лиссабон", "PRT", 38.7223, -9.1393),
+            ("Бельгия", "Брюссель", "BEL", 50.8503, 4.3517),
+            ("Нидерланды", "Амстердам", "NLD", 52.3676, 4.9041),
+            ("Украина", "Киев", "UKR", 50.4501, 30.5234),
+        ],
+        "hard": [
+            ("Вьетнам", "Ханой", "VNM", 21.0278, 105.8342),
+            ("Малайзия", "Куала-Лумпур", "MYS", 3.1390, 101.6869),
+            ("Камбоджа", "Пномпень", "KHM", 11.5564, 104.9282),
+            ("Монголия", "Улан-Батор", "MNG", 47.8864, 106.9057),
+            ("Иран", "Тегеран", "IRN", 35.6892, 51.3890),
+            ("Ирак", "Багдад", "IRQ", 33.3152, 44.3661),
+            ("Афганистан", "Кабул", "AFG", 34.5553, 69.2075),
+            ("Саудовская Аравия", "Эр-Рияд", "SAU", 24.7136, 46.6753),
+            ("Марокко", "Рабат", "MAR", 34.0209, -6.8416),
+            ("Новая Зеландия", "Веллингтон", "NZL", -41.2866, 174.7756),
+        ],
+    }
 
+    cities = {
+        "easy": [
+            ("США", "Нью-Йорк", "USA", 40.7128, -74.0060),
+            ("США", "Лос-Анджелес", "USA", 34.0522, -118.2437),
+            ("Россия", "Москва", "RUS", 55.7558, 37.6173),
+            ("Россия", "Санкт-Петербург", "RUS", 59.9311, 30.3609),
+            ("Китай", "Пекин", "CHN", 39.9042, 116.4074),
+            ("Япония", "Осака", "JPN", 34.6937, 135.5023),
+            ("Индия", "Мумбаи", "IND", 19.0760, 72.8777),
+            ("ОАЭ", "Дубай", "ARE", 25.2048, 55.2708),
+            ("Италия", "Милан", "ITA", 45.4642, 9.1900),
+            ("Испания", "Барселона", "ESP", 41.3851, 2.1734),
+        ],
+        "medium": [
+            ("Таиланд", "Бангкок", "THA", 13.7563, 100.5018),
+            ("Южная Корея", "Сеул", "KOR", 37.5665, 126.9780),
+            ("Аргентина", "Буэнос-Айрес", "ARG", -34.6037, -58.3816),
+            ("Мексика", "Мехико", "MEX", 19.4326, -99.1332),
+            ("Чили", "Сантьяго", "CHL", -33.4489, -70.6693),
+            ("Перу", "Лима", "PER", -12.0464, -77.0428),
+            ("Колумбия", "Богота", "COL", 4.7110, -74.0721),
+            ("Турция", "Стамбул", "TUR", 41.0082, 28.9784),
+            ("Индонезия", "Джакарта", "IDN", -6.2088, 106.8456),
+            ("Египет", "Александрия", "EGY", 31.2001, 29.9187),
+        ],
+        "hard": [
+            ("Казахстан", "Алматы", "KAZ", 43.2220, 76.8512),
+            ("Узбекистан", "Ташкент", "UZB", 41.2995, 69.2401),
+            ("Таджикистан", "Душанбе", "TJK", 38.5598, 68.7870),
+            ("Катар", "Доха", "QAT", 25.2854, 51.5310),
+            ("Кувейт", "Эль-Кувейт", "KWT", 29.3759, 47.9774),
+            ("Оман", "Маскат", "OMN", 23.5880, 58.3829),
+            ("Бахрейн", "Манама", "BHR", 26.2235, 50.5876),
+            ("Сингапур", "Сингапур", "SGP", 1.3521, 103.8198),
+            ("Ливан", "Бейрут", "LBN", 33.8938, 35.5018),
+            ("Иордания", "Амман", "JOR", 31.9454, 35.9284),
+        ],
+    }
 
-def generate_countries():
-    questions = []
+    landmarks = {
+        "easy": [
+            ("Франция", "Эйфелева башня", "FRA", 48.8584, 2.2945),
+            ("Италия", "Колизей", "ITA", 41.8902, 12.4922),
+            ("США", "Статуя Свободы", "USA", 40.6892, -74.0445),
+            ("Египет", "Пирамиды Гизы", "EGY", 29.9792, 31.1342),
+            ("Китай", "Великая Китайская стена", "CHN", 40.4319, 116.5704),
+            ("Индия", "Тадж-Махал", "IND", 27.1751, 78.0421),
+            ("Бразилия", "Христос-Искупитель", "BRA", -22.9519, -43.2105),
+            ("Австралия", "Оперный театр Сиднея", "AUS", -33.8568, 151.2153),
+            ("Россия", "Красная площадь", "RUS", 55.7539, 37.6208),
+            ("Турция", "Айя-София", "TUR", 41.0086, 28.9802),
+        ],
+        "medium": [
+            ("Великобритания", "Биг-Бен", "GBR", 51.5007, -0.1246),
+            ("ОАЭ", "Бурдж-Халифа", "ARE", 25.1972, 55.2744),
+            ("Мексика", "Чичен-Ица", "MEX", 20.6843, -88.5678),
+            ("Канада", "Ниагарский водопад", "CAN", 43.0962, -79.0377),
+            ("ЮАР", "Столовая гора", "ZAF", -33.9628, 18.4098),
+            ("Перу", "Мачу-Пикчу", "PER", -13.1631, -72.5450),
+            ("Камбоджа", "Ангкор-Ват", "KHM", 13.4125, 103.8670),
+            ("Малайзия", "Башни Петронас", "MYS", 3.1579, 101.7117),
+            ("Россия", "Эрмитаж", "RUS", 59.9398, 30.3146),
+            ("США", "Голливуд", "USA", 34.0928, -118.3287),
+        ],
+        "hard": [
+            ("Исландия", "Голубая лагуна", "ISL", 63.8804, -22.4495),
+            ("Норвегия", "Гейрангер-фьорд", "NOR", 62.1049, 7.2077),
+            ("Индонезия", "Храм Боробудур", "IDN", -7.6079, 110.2038),
+            ("Непал", "Ступа Боднатх", "NPL", 27.7215, 85.3620),
+            ("Марокко", "Синий город Шефшауэн", "MAR", 35.1714, -5.2697),
+            ("Италия", "Помпеи", "ITA", 40.7497, 14.4869),
+            ("Франция", "Мон-Сен-Мишель", "FRA", 48.6361, -1.5115),
+            ("США", "Гранд-Каньон", "USA", 36.1069, -112.1129),
+            ("Китай", "Запретный город", "CHN", 39.9163, 116.3972),
+            ("Россия", "Байкал", "RUS", 53.5587, 108.1650),
+        ],
+    }
 
-    for difficulty, data in LANDMARKS.items():
-        for name, country, lat, lng in data:
-            questions.append({
-                "question_text": f"В какой стране находится {name}?",
-                "target_type": "country",
-                "target_name": country,
-                "correct_lat": lat,
-                "correct_lng": lng,
-                "mode": "countries",
-                "difficulty": difficulty,
-                "is_active": True
-            })
+    # ===================== GENERATION =====================
 
-    return questions
+    for diff, items in capitals.items():
+        for c, city, code, lat, lng in items:
+            questions.append(make(f"Столица страны {c}?", "capital", city, code, lat, lng, "capitals", diff))
 
+    for diff, items in cities.items():
+        for c, city, code, lat, lng in items:
+            questions.append(make(f"В какой стране находится город {city}?", "country", c, code, lat, lng, "countries", diff))
 
-def generate_landmarks():
-    questions = []
+    for diff, items in landmarks.items():
+        for c, name, code, lat, lng in items:
+            questions.append(make(f"Где находится {name}?", "landmark", c, code, lat, lng, "landmarks", diff))
 
-    for difficulty, data in LANDMARKS.items():
-        for name, country, lat, lng in data:
-            questions.append({
-                "question_text": f"Найди на карте: {name}",
-                "target_type": "landmark",
-                "target_name": name,
-                "correct_lat": lat,
-                "correct_lng": lng,
-                "mode": "landmarks",
-                "difficulty": difficulty,
-                "is_active": True
-            })
+    print(f"Generated: {len(questions)} questions")
 
-    return questions
-
-
-def generate_test_questions():
-    return [
-        {
-            "question_text": "В какой стране находится очень длинное и специально перегруженное название достопримечательности, которое должно проверить, как интерфейс справляется с переполнением текста и переносами строк в карточке?",
-            "target_type": "country",
-            "target_name": "Япония",
-            "correct_lat": 35.6762,
-            "correct_lng": 139.6503,
-            "mode": "countries",
-            "difficulty": "medium",
-            "is_active": True
-        },
-        {
-            "question_text": "Где находится точка с экстремальными координатами?",
-            "target_type": "landmark",
-            "target_name": "Null Island",
-            "correct_lat": 0.0,
-            "correct_lng": 0.0,
-            "mode": "landmarks",
-            "difficulty": "easy",
-            "is_active": True
-        },
-        {
-            "question_text": "Где находится Сиднейский оперный театр?",
-            "target_type": "landmark",
-            "target_name": "Сиднейский оперный театр",
-            "correct_lat": -33.8568,
-            "correct_lng": 151.2153,
-            "mode": "landmarks",
-            "difficulty": "easy",
-            "is_active": True
-        },
-        {
-            "question_text": "Редактируемый тестовый вопрос (проверь edit flow)",
-            "target_type": "country",
-            "target_name": "Франция",
-            "correct_lat": 48.8566,
-            "correct_lng": 2.3522,
-            "mode": "capitals",
-            "difficulty": "hard",
-            "is_active": True
-        },
-        {
-            "question_text": "Скрытый вопрос для проверки состояния UI",
-            "target_type": "capital",
-            "target_name": "Германия",
-            "correct_lat": 52.52,
-            "correct_lng": 13.405,
-            "mode": "capitals",
-            "difficulty": "medium",
-            "is_active": False
-        },
-    ]
-
-def generate_all_questions():
-    all_q = (
-            generate_capitals() +
-            generate_countries() +
-            generate_landmarks() +
-            generate_test_questions()
-    )
-
-    seen = set()
-    unique = []
-
-    for q in all_q:
-        key = (q["question_text"], q["mode"])
-
-        if key in seen:
-            continue
-
-        seen.add(key)
-        unique.append(q)
-
-    return unique
-
-
-def seed_questions(db: Session, force_recreate: bool = False):
-
-    questions = generate_all_questions()
-
-    if force_recreate:
-        # Delete all existing questions (careful - this breaks foreign keys)
-        db.execute(text("DELETE FROM session_questions"))
-        db.execute(text("DELETE FROM answers"))
-        db.execute(text("DELETE FROM questions"))
-        print("Deleted all existing questions")
-    else:
-        # Get existing question texts for update check
-        existing = db.query(Question).all()
-        existing_map = {
-            (q.question_text, q.mode): q 
-            for q in existing
-        }
-        
-        # Track which questions we've updated
-        updated_texts = set()
-        
-        for q in questions:
-            key = (q["question_text"], q["mode"])
-            
-            if key in existing_map:
-                # Update existing question
-                existing_q = existing_map[key]
-                existing_q.target_type = q["target_type"]
-                existing_q.target_name = q["target_name"]
-                existing_q.correct_lat = q["correct_lat"]
-                existing_q.correct_lng = q["correct_lng"]
-                existing_q.difficulty = q["difficulty"]
-                existing_q.is_active = q["is_active"]
-                updated_texts.add(key)
-            else:
-                db.add(Question(**q))
-
-        
-        print(f"Updated {len(updated_texts)} existing questions")
-
-    if not force_recreate:
-        existing_texts = db.query(Question).all()
-        existing_keys = {(q.question_text, q.mode) for q in existing_texts}
-        
-        new_questions = [q for q in questions if (q["question_text"], q["mode"]) not in existing_keys]
-        
-        for q in new_questions:
-            db.add(Question(**q))
-        
-        if new_questions:
-            print(f"Added {len(new_questions)} new questions")
-
+    db.add_all([Question(**q) for q in questions])
     db.commit()
 
-    total = db.query(Question).count()
-    active = db.query(Question).filter_by(is_active=True).count()
-    print(f"Total questions in DB: {total} (active: {active})")
+    print("Inserted structured 3x3x10 dataset successfully")
 
 
 if __name__ == "__main__":
-    import sys
-    
-    force = "--force" in sys.argv or "-f" in sys.argv
-    
-    from backend.app.db import SessionLocal
-
     db = SessionLocal()
     try:
-        seed_questions(db, force_recreate=force)
+        seed(db, force="--force" in sys.argv)
     finally:
         db.close()

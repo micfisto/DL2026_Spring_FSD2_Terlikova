@@ -1,65 +1,98 @@
 import json
-import urllib.request
+import os
+from shapely.geometry import shape, Point
 
 _geo_cache = None
+_country_index = None
+
+
+def normalize_code(code: str):
+    if not code:
+        return None
+
+    code = code.strip().upper()
+
+    if code in ["-99", "XX", "NULL", "N/A", "NONE"]:
+        return None
+
+    return code
+
+
+def point_in_country(lat, lng, country_code):
+    index = _get_index()
+
+    code = normalize_code(country_code)
+    if not code:
+        print("INVALID CODE INPUT:", country_code)
+        return False
+
+    geometry = index.get(code)
+
+    if not geometry:
+        print("NOT FOUND CODE:", code)
+        return False
+
+    point = Point(lng, lat)
+    polygon = shape(geometry)
+
+    return polygon.covers(point)
 
 
 def _load_geojson():
     global _geo_cache
 
     if _geo_cache is None:
-        url = "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson"
-        with urllib.request.urlopen(url, timeout=30) as r:
-            _geo_cache = json.loads(r.read().decode())
+        path = os.path.join(
+            os.path.dirname(__file__),
+            "../../data/countries.geojson"
+        )
+        path = os.path.abspath(path)
+
+        print("LOADING GEOJSON FROM:", path)
+
+        with open(path, "r", encoding="utf-8") as f:
+            _geo_cache = json.load(f)
 
     return _geo_cache
 
 
-def point_in_country(lat, lng, country_code):
+def _build_index():
     geo = _load_geojson()
+    index = {}
 
-    target = None
-    for f in geo["features"]:
-        iso = f["properties"].get("ISO_A3")
-        if iso == country_code or iso == country_code.upper():
-            target = f
-            break
+    for feature in geo.get("features", []):
+        props = feature.get("properties", {})
 
-    if not target:
-        return False
+        # разные возможные поля (ВАЖНО)
+        candidates = [
+            props.get("ISO_A3"),
+            props.get("iso_a3"),
+            props.get("ISO3166-1-Alpha-3"),
+            props.get("ADM0_A3"),
+        ]
 
-    return _point_in_geometry(lat, lng, target["geometry"])
+        code = None
+        for c in candidates:
+            c = normalize_code(c)
+            if c:
+                code = c
+                break
+
+        if not code:
+            continue
+
+        index[code] = feature["geometry"]
+
+    print("INDEX SIZE:", len(index))
+    print("SAMPLE KEYS:", list(index.keys())[:20])
+
+    return index
 
 
-def _point_in_geometry(lat, lng, geometry):
-    if geometry["type"] == "Polygon":
-        polygons = [geometry["coordinates"]]
-    elif geometry["type"] == "MultiPolygon":
-        polygons = geometry["coordinates"]
-    else:
-        return False
+def _get_index():
+    global _country_index
 
-    for polygon in polygons:
-        for ring in polygon:
-            if _point_in_ring(lat, lng, ring):
-                return True
+    if _country_index is None:
+        _country_index = _build_index()
 
-    return False
-
-
-def _point_in_ring(lat, lng, ring):
-    inside = False
-    n = len(ring)
-
-    for i in range(n):
-        j = (i + 1) % n
-
-        xi, yi = ring[i]
-        xj, yj = ring[j]
-
-        if ((yi > lng) != (yj > lng)) and (
-            lat < (xj - xi) * (lng - yi) / (yj - yi) + xi
-        ):
-            inside = not inside
-
-    return inside
+    return _country_index

@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { gameAPI } from "../api/game.api";
+import {create} from "zustand";
+import {gameAPI} from "../api/game.api";
 
 export const useGameStore = create((set, get) => ({
     sessionId: null,
@@ -21,8 +21,8 @@ export const useGameStore = create((set, get) => ({
     mode: null,
     difficulty: null,
 
-    setMode: (mode) => set({ mode }),
-    setDifficulty: (difficulty) => set({ difficulty }),
+    setMode: (mode) => set({mode}),
+    setDifficulty: (difficulty) => set({difficulty}),
 
     startGame: async (config) => {
         set({
@@ -58,7 +58,7 @@ export const useGameStore = create((set, get) => ({
         }
     },
 
-    setSelectedPoint: (point) => set({ selectedPoint: point }),
+    setSelectedPoint: (point) => set({selectedPoint: point}),
 
     answer: async () => {
         const state = get();
@@ -78,11 +78,11 @@ export const useGameStore = create((set, get) => ({
         const qid = question?.id ?? question?.question_id;
 
         if (!qid || qid !== currentQuestionId) {
-            console.warn("DROP ANSWER:", { qid, currentQuestionId });
+            console.warn("DROP ANSWER:", {qid, currentQuestionId});
             return;
         }
 
-        set({ loading: true, error: null });
+        set({loading: true, error: null});
 
         const lat = selectedPoint?.lat ?? 0;
         const lng = selectedPoint?.lng ?? 0;
@@ -110,7 +110,7 @@ export const useGameStore = create((set, get) => ({
     },
 
     next: async () => {
-        const { sessionId } = get();
+        const {sessionId} = get();
         if (!sessionId) return;
 
         set({
@@ -150,10 +150,10 @@ export const useGameStore = create((set, get) => ({
     },
 
     finish: async () => {
-        const { sessionId } = get();
+        const {sessionId} = get();
         if (!sessionId) return;
         return gameAPI.finishGame(sessionId);
     },
 
-    clearError: () => set({ error: null }),
+    clearError: () => set({error: null}),
 }));

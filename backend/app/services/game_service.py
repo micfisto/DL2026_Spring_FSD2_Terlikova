@@ -57,7 +57,7 @@ def _format(q: Question) -> QuestionResponse:
         text=q.question_text,
         target_type=q.target_type,
         target_name=q.target_name,
-        correct_country_code=q.target_name if q.target_type == "country" else None
+        correct_country_code=q.country_code
     )
 
 
@@ -68,7 +68,6 @@ def _is_last(db: Session, session: GameSession):
 # ---------------- core ----------------
 
 def start_game(db: Session, request: StartGameRequest):
-
     questions = (
         db.query(Question)
         .filter(
@@ -116,7 +115,6 @@ def start_game(db: Session, request: StartGameRequest):
 
 
 def get_current_question(db: Session, session_id: int):
-
     session = _session(db, session_id)
 
     index = _answered_count(db, session_id)
@@ -133,7 +131,6 @@ def get_current_question(db: Session, session_id: int):
 
 
 def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
-
     session = _session(db, session_id)
 
     index = _answered_count(db, session_id)
@@ -142,29 +139,32 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
     if not q or q.id != request.question_id:
         raise HTTPException(status_code=400, detail="Неверный вопрос")
 
-    distance = None
     points = 0
+    distance = 0.0
 
-    if q.target_type == "country":
+    # ---------------- COUNTRIES ----------------
+    if q.mode == "countries":
+
+
+        if not q.country_code:
+            raise HTTPException(500, "Missing country_code")
 
         ok = point_in_country(
             request.selected_lat,
             request.selected_lng,
-            q.target_name
+            q.country_code
         )
 
+        print("CODE:", q.country_code)
+        print("OK:", ok)
+
+        distance = 0.0
         if ok:
             points = get_max_points_for_difficulty(session.difficulty)
-            distance = 0
         else:
-            distance = calculate_distance_km(
-                request.selected_lat,
-                request.selected_lng,
-                q.correct_lat,
-                q.correct_lng
-            )
-            points = calculate_points(distance, session.difficulty)
+            points = 0
 
+    # ---------------- other modes ----------------
     else:
         distance = calculate_distance_km(
             request.selected_lat,
@@ -172,9 +172,10 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
             q.correct_lat,
             q.correct_lng
         )
+
         points = calculate_points(distance, session.difficulty)
 
-    db.add(Answer(
+    answer = Answer(
         session_id=session.id,
         question_id=q.id,
         selected_lat=request.selected_lat,
@@ -182,9 +183,12 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
         distance_km=distance,
         points_earned=points,
         answered_at=datetime.datetime.utcnow()
-    ))
+    )
+
+    db.add(answer)
 
     session.score += points
+
     db.commit()
 
     return SubmitAnswerResponse(
@@ -199,7 +203,6 @@ def submit_answer(db: Session, session_id: int, request: SubmitAnswerRequest):
 
 
 def get_next_question(db: Session, session_id: int):
-
     session = _session(db, session_id)
 
     next_index = _answered_count(db, session_id)
@@ -223,7 +226,6 @@ def get_next_question(db: Session, session_id: int):
 
 
 def finish_game(db: Session, session_id: int):
-
     session = _session(db, session_id)
 
     session.status = "finished"
@@ -241,7 +243,6 @@ def finish_game(db: Session, session_id: int):
 
 
 def get_game_result(db: Session, session_id: int):
-
     session = _session(db, session_id)
 
     if session.status != "finished":
